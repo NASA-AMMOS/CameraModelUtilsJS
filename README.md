@@ -1,5 +1,8 @@
 # CameraModelUtilsJS
 
+[![build](https://img.shields.io/github/workflow/status/NASA-AMMOS/CameraModelUtilsJS/Node.js%20CI?style=flat-square&label=build)](https://github.com/NASA-AMMOS/CameraModelUtilsJS/actions)
+[![lgtm code quality](https://img.shields.io/lgtm/grade/javascript/g/NASA-AMMOS/CameraModelUtilsJS.svg?style=flat-square&label=code-quality)](https://lgtm.com/projects/g/NASA-AMMOS/CameraModelUtilsJS/)
+
 Series of packages for visualizing and rendering images and frustum shapes based on CAHVORE camera models as well as loading SGI and PGM images in three.js.
 
 ## Packages
