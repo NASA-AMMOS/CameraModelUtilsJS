@@ -2,13 +2,36 @@
   "name": "cahvore-camera-tools",
   "description": "Set of cahvore transformation functions ported from C++ implementations.",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NASA-AMMOS/CameraModelUtilsJS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NASA-AMMOS/CameraModelUtilsJS/issues"
+  },
+  "homepage": "https://github.com/NASA-AMMOS/CameraModelUtilsJS#readme",
   "dependencies": {
     "three": "^0.136.0"
   },
+  "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
+  "license": "Apache-2.0",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Warn: no test specified\""
   },
   "sideEffects": false,
-  "type": "module"
+  "type": "module",
+  "keywords": [
+    "visualization",
+    "camera",
+    "nasa",
+    "nasa-jpl",
+    "graphics",
+    "threejs",
+    "rendering",
+    "cahvore",
+    "cahvor",
+    "cahv",
+    "camera-model"
+  ]
 }
