@@ -75,8 +75,11 @@ Algorithm by Todd Litwin
 Partially ported from
 [cmod_cahvor](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvor.c#L72-L288).
 
-Uses the Yakimovsky & Cunningham camera model known locally as CAHVOR
-This function projects a 2D image point out into 3D using the camera model parameters provided.
+Functions for using the camera model known
+locally as CAHVOR. This model is an extension by Donald Gennery
+into radial distortion of the linear model by Yakimovsky &
+Cunningham, known locally as CAHV.
+
 Note it does not output the partial derivative of uvec3 to pos2
 
 ### getRay
