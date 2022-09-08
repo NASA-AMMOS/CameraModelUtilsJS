@@ -25,7 +25,8 @@ cmod_cahvore_2d_to_3d_general(
 ) : { pos3, uvec3 }
 ```
 
-Algorithm by Todd Litwin
+Implementation by Todd Litwin
+
 Partially ported from
 [cmod_cahvore](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvore.c#L142-L431).
 
@@ -47,7 +48,8 @@ cmod_cahv_2d_to_3d(
 ) : { pos3, uvec3 }
 ```
 
-Algorithm by Todd Litwin
+Implementation by Todd Litwin
+
 Partially ported from
 [cmod_cahv](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahv.c#L57-L123).
 
@@ -71,7 +73,8 @@ cmod_cahvor_2d_to_3d(
 ) : { pos3, uvec3 }
 ```
 
-Algorithm by Todd Litwin
+Implementation by Todd Litwin
+
 Partially ported from
 [cmod_cahvor](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvor.c#L72-L288).
 
