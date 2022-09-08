@@ -10,13 +10,6 @@
 		"no-throw-literal": [
 			"error"
 		],
-		"prefer-const": [
-			"error",
-			{
-				"destructuring": "any",
-				"ignoreReadBeforeAssign": false
-			}
-		],
 		"quotes": [ "error", "single" ]
 	}
 }
