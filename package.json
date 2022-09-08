@@ -1,0 +1,14 @@
+{
+  "name": "cahvore-camera-tools",
+  "description": "Set of cahvore transformation functions ported from C++ implementations.",
+  "version": "0.0.1",
+  "dependencies": {
+    "three": "^0.136.0"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Warn: no test specified\""
+  },
+  "sideEffects": false,
+  "type": "module"
+}
