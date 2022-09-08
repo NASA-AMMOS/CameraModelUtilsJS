@@ -7,34 +7,34 @@ export const CAHVOR = 1;
 export const CAHVORE = 2;
 
 export const cahvoreUnprojectShader = {
-    uniforms: {
+	uniforms: {
 
-        tex: { value: null },
-        inverseFrame: { value: new Matrix4() },
-        cahvoreProjectionMatrix: { value: new Matrix4() },
+		tex: { value: null },
+		inverseFrame: { value: new Matrix4() },
+		cahvoreProjectionMatrix: { value: new Matrix4() },
 
-        // left, bottom, width, height
-        imageWidth: { value: 0 },
-        imageHeight: { value: 0 },
+		// left, bottom, width, height
+		imageWidth: { value: 0 },
+		imageHeight: { value: 0 },
 
-        C: { value: new Vector3() },
-        A: { value: new Vector3() },
-        H: { value: new Vector3() },
-        V: { value: new Vector3() },
-        O: { value: new Vector3() },
-        R: { value: new Vector3() },
-        E: { value: new Vector3() },
-        linearity: { value: 1.0 },
+		C: { value: new Vector3() },
+		A: { value: new Vector3() },
+		H: { value: new Vector3() },
+		V: { value: new Vector3() },
+		O: { value: new Vector3() },
+		R: { value: new Vector3() },
+		E: { value: new Vector3() },
+		linearity: { value: 1.0 },
 
-    },
+	},
 
-    defines: {
-        MODEL_TYPE: CAHVORE,
-        DISPLAY_GRID: 0,
-        PASSTHROUGH: 0,
-    },
+	defines: {
+		MODEL_TYPE: CAHVORE,
+		DISPLAY_GRID: 0,
+		PASSTHROUGH: 0,
+	},
 
-    vertexShader: /* glsl */`
+	vertexShader: /* glsl */`
         varying vec2 vUv;
 		void main() {
 			vUv = uv;
@@ -42,7 +42,7 @@ export const cahvoreUnprojectShader = {
 		}
     `,
 
-    fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */`
         #define CAHV 0
         #define CAHVOR 1
         #define CAHVORE 2
