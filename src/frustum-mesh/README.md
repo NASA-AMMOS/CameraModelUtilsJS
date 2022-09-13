@@ -10,9 +10,14 @@ const parameters = { ...cavoreModel };
 parameters.nearDist = 0.5;
 parameters.farDist = 15;
 
-const distortedFrustum = new FrustumMesh();
-distortedFrustum.setParameters( parameters );
-distortedFrustum.material = new MeshPhongMaterial();
+// create the frustum
+const distortedFrustum = new FrustumMesh(
+	parameters,
+	new MeshPhongMaterial( {
+		transparent: true,
+		opacity: 0.25,
+	} )
+);
 
 scene.add( distortedFrustum );
 ```
