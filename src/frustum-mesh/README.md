@@ -159,7 +159,10 @@ _extends Mesh_
 ### .constructor
 
 ```js
-constructor( parameters : CAHVOREOptions = undefined, material : Material = undefined ) : void
+constructor(
+	parameters : CAHVOREOptions = undefined,
+	material : Material = undefined
+) : void
 ```
 
 TODO (add parameters support)
