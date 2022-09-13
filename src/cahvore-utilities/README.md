@@ -6,10 +6,19 @@ Original implementation by Todd Litwin.
 
 # Use
 
+## Ray Derivation
 ```js
 // get the projected bounds info.
 const modelInfo = getLinearFrustumInfo( cahvoreModel );
 
+// retrieves the ray distorted by the model at the given point
+const ray = new Ray();
+const imageCoord = new Vector2( modelInfo.width * 0.5, modelInfo.height * 0.5 );
+getRay( cahvoreModel, imageCoord, ray );
+```
+
+## Frustum Derivation and Preview
+```js
 // retrieves the linear frustum inscribed in the frustum formed by
 // the minimum points inside the distorted frustum shape and specified
 // in the modelInfo.frame.
@@ -22,10 +31,23 @@ frameBoundsToProjectionMatrix( modelInfo.minFrameBounds, 0.1, 15.0, minFrustum )
 const maxFrustum = new Matrix4();
 frameBoundsToProjectionMatrix( modelInfo.maxFrameBounds, 0.1, 15.0, maxFrustum );
 
-// retrieves the ray distorted by the model at the given point
-const ray = new Ray();
-const imageCoord = new Vector2( modelInfo.width * 0.5, modelInfo.height * 0.5 );
-getRay( cahvoreModel, imageCoord, ray );
+// render the scene with the max frustum
+const aspect = cahvoreModel.width / cahvoreModel.height;
+const renderTarget = new WebGLRenderTarget( 1000 * aspect, 1000 ); // TODO: set from model dimensions
+camera.projectionMatrix.copy( maxFrustum );
+camera.projectionMatrixInverse .copy( maxFrustum ).invert();
+renderer.setRenderTarget( renderTarget );
+renderer.render( scene, camera );
+renderer.setRenderTarget( null );
+
+// initialize the material and render the distorted view
+const distortionMaterial = new CahvoreDistortionMaterial();
+distortionMaterial.map = renderTarget;
+distortionMaterial.setFromCameraModel( cahvoreModel );
+
+// render the distortion with a full screen pass
+const pass = new FullScreenQuad( distortionMaterial );
+pass.render( renderer );
 ```
 
 # API
@@ -179,12 +201,19 @@ The bounds that completely encompass the cahvore model at the maximum extents 1m
 
 _extends THREE.ShaderMaterial_
 
-
-
 ### Uniforms
 
 ```js
 {
-	TODO
+	// the render target rendered with the
+	map = null : Texture
 }
 ```
+
+### .setFromCameraModel
+
+```js
+setFromCameraModel( cahvoreModel : Object ) : void
+```
+
+Sets the necessary uniforms to properly distort the camera preview.

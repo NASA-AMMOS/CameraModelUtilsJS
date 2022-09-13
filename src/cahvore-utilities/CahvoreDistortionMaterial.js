@@ -39,20 +39,20 @@ export class CahvoreDistortionMaterial extends ShaderMaterial {
 
 			} );
 
-		Object.defineProperty( this, 'tex', {
+		Object.defineProperty( this, 'map', {
 			get() {
 
-				return this.uniforms[ 'tex' ].value;
+				return this.uniforms[ 'map' ].value;
 
 			},
 			set( v ) {
 
-				if ( this.uniforms[ 'tex' ] === null ) {
+				if ( this.uniforms[ 'map' ] === null ) {
 
 					this.needsUpdate = true;
 
 				}
-				this.uniforms[ 'tex' ].value = v;
+				this.uniforms[ 'map' ].value = v;
 
 			},
 		} );

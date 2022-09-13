@@ -9,7 +9,7 @@ export const CAHVORE = 2;
 export const cahvoreUnprojectShader = {
 	uniforms: {
 
-		tex: { value: null },
+		map: { value: null },
 		inverseFrame: { value: new Matrix4() },
 		cahvoreProjectionMatrix: { value: new Matrix4() },
 
@@ -47,7 +47,7 @@ export const cahvoreUnprojectShader = {
         #define CAHVOR 1
         #define CAHVORE 2
 
-        uniform sampler2D tex;
+        uniform sampler2D map;
         uniform mat4 inverseFrame;
         uniform mat4 cahvoreProjectionMatrix;
         uniform float linearity;
@@ -76,7 +76,7 @@ export const cahvoreUnprojectShader = {
 
             #if PASSTHROUGH
 
-                gl_FragColor = texture2D( tex, vUv );
+                gl_FragColor = texture2D( map, vUv );
 
             #else
 
@@ -138,7 +138,7 @@ export const cahvoreUnprojectShader = {
                 #else
 
                     // sample pixel at the found x, y value
-                    gl_FragColor = texture2D( tex, sampleCoord.xy );
+                    gl_FragColor = texture2D( map, sampleCoord.xy );
 
                 #endif
 
