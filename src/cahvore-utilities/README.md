@@ -1,12 +1,13 @@
 # CAHVORE Transformation Utilities
 
-Set of functions for converting a 2D camera coordinate to a camera ray ported from the [original C implementation](https://github.jpl.nasa.gov/telitwin/cmod/blob/master/model/cmod_cahv.c).
+Set of functions for converting a 2D camera coordinate to a camera ray ported from the [original C implementation](https://github.jpl.nasa.gov/telitwin/cmod/blob/master/model/cmod_cahv.c) (JPL internal only).
 
 Original implementation by Todd Litwin.
 
 # API
 
 ## Functions
+
 ### cmod_cahvore_2d_to_3d_general
 
 ```js
@@ -25,12 +26,9 @@ cmod_cahvore_2d_to_3d_general(
 ) : { pos3, uvec3 }
 ```
 
-Partially ported from
-[cmod_cahvore](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvore.c#L142-L431).
+Partially ported from [cmod_cahvore](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvore.c#L142-L431).
 
-This function projects a 2D image point out into 3D using the
-camera model parameters provided.
-Note this port does not calculate partial derivatives of pos3 to pos2 or uvec3 to uvec2
+This function projects a 2D image point out into 3D using the camera model parameters provided. Note this port does not calculate partial derivatives of pos3 to pos2 or uvec3 to uvec2.
 
 ### cmod_cahv_2d_to_3d
 
@@ -46,12 +44,9 @@ cmod_cahv_2d_to_3d(
 ) : { pos3, uvec3 }
 ```
 
-Partially ported from
-[cmod_cahv](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahv.c#L57-L123).
+Partially ported from [cmod_cahv](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahv.c#L57-L123).
 
-Uses the Yakimovsky & Cunningham camera model known locally as CAHV
-This function projects a 2D image point out into 3D using the camera model parameters provided.
-Note it does not output the partial derivative of uvec3 to pos2
+Uses the Yakimovsky & Cunningham camera model known locally as CAHV. This function projects a 2D image point out into 3D using the camera model parameters provided. Note it does not output the partial derivative of uvec3 to pos2.
 
 ### cmod_cahvor_2d_to_3d
 
@@ -69,15 +64,9 @@ cmod_cahvor_2d_to_3d(
 ) : { pos3, uvec3 }
 ```
 
-Partially ported from
-[cmod_cahvor](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvor.c#L72-L288).
+Partially ported from [cmod_cahvor](https://github.jpl.nasa.gov/telitwin/cmod/blob/7eae22ecfcf5e6c98c10829f3dfdc05ff7614f02/model/cmod_cahvor.c#L72-L288).
 
-Functions for using the camera model known
-locally as CAHVOR. This model is an extension by Donald Gennery
-into radial distortion of the linear model by Yakimovsky &
-Cunningham, known locally as CAHV.
-
-Note it does not output the partial derivative of uvec3 to pos2
+Functions for using the camera model known locally as CAHVOR. This model is an extension by Donald Gennery into radial distortion of the linear model by Yakimovsky & Cunningham, known locally as CAHV. Note it does not output the partial derivative of uvec3 to pos2.
 
 ### getRay
 
@@ -85,8 +74,7 @@ Note it does not output the partial derivative of uvec3 to pos2
 getRay( model : Object, sample : Vector2, outRay : Ray ) : void
 ```
 
-Returns the outgoing ray from the camera model given an image sample coordinate. Internally calls
-the appropriate camera model to ray function.
+Returns the outgoing ray from the camera model given an image sample coordinate. Internally calls the appropriate camera model to ray function.
 
 ### getLinearFrustumInfo
 
@@ -94,8 +82,7 @@ the appropriate camera model to ray function.
 getLinearFrustumInfo( model : Object ) : LinearFrustumInfo
 ```
 
-Function takes a camera model and returns an object describing the resulting local camera frame
-and minimum and maximum frustums.
+Function takes a camera model and returns an object describing the resulting local camera frame and minimum and maximum frustums.
 
 ### frameBoundsToProjectionMatrix
 
@@ -108,30 +95,29 @@ frameBoundsToProjectionMatrix(
 ) : target
 ```
 
-Function that takes a frame bounds description of a bounding box 1m out in the camera frame
-and sets the "target" matrix to an off axis projection matrix with the apex at the current origin.
+Function that takes a frame bounds description of a bounding box 1m out in the camera frame and sets the "target" matrix to an off axis projection matrix with the apex at the current origin.
 
 ## FrameBounds
 
-### left
+### .left
 
 ```js
 left : Number
 ```
 
-### right
+### .right
 
 ```js
 right : Number
 ```
 
-### top
+### .top
 
 ```js
 top : Number
 ```
 
-### bottom
+### .bottom
 
 ```js
 bottom : Number
@@ -139,7 +125,7 @@ bottom : Number
 
 ## LinearFrustumInfo
 
-### frame
+### .frame
 
 ```js
 frame : Matrix4
@@ -147,20 +133,18 @@ frame : Matrix4
 
 The transformation frame of the linear camera model frustums. Equivalent to "Camera.matrix".
 
-### minFrameBounds
+### .minFrameBounds
 
 ```js
 minFrameBounds : FrameBounds
 ```
 
-The bounds that are completely encompassed the cahvore model at the minimal extents 1m out in
-the given frame.
+The bounds that are completely encompassed the cahvore model at the minimal extents 1m out in the given frame.
 
-### maxFrameBounds
+### .maxFrameBounds
 
 ```js
 maxFrameBounds : FrameBounds
 ```
 
-The bounds that completely encompass the cahvore model at the maximum extents 1m out in
-the given frame.
+The bounds that completely encompass the cahvore model at the maximum extents 1m out in the given frame.
