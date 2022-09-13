@@ -149,7 +149,7 @@ Value in the range [0, 1]. Indicates how much the ends will be projected to be p
 
 ## FrustumMesh
 
-Frustum for depicting the view volume of a camera. This will be transformed using the camera model settings.
+Frustum shape mesh for depicting the view volume of a camera.
 
 _extends Mesh_
 
@@ -165,7 +165,7 @@ constructor( material : Material ) : void
 setParameters( parameters : CAHVOREParameters ) : void
 ```
 
-Update the parameters of the distorted frustum geometry.
+Update the parameters of the distorted frustum geometry. This will generate a frustum distorted by the camera model settings.
 
 ### .setFromProjectionMatrix
 
