@@ -6,18 +6,18 @@ A class in the same form as the three.js loaders for loading and parsing [PGM im
 
 ```js
 const loader = new PGMLoader();
-loader.load('path/to/file.pgm', array => {
+loader.load( 'path/to/file.pgm', array => {
 
     // ... loaded data ...
 
-});
+} );
 ```
 
 # API
 
 ## PGMResult
 
-### data
+### .data
 
 ```js
 data : Uint16Array | Uint8Array
@@ -25,7 +25,7 @@ data : Uint16Array | Uint8Array
 
 The PGM laid out in an array in row major order where each row has a stride of `width`.
 
-### width
+### .width
 
 ```js
 width : Number
@@ -33,7 +33,7 @@ width : Number
 
 The width of the pgm file in pixels.
 
-### height
+### .height
 
 ```js
 height : Number
@@ -41,7 +41,7 @@ height : Number
 
 The height of the pgm file in pixels.
 
-### maxValue
+### .maxValue
 
 ```js
 maxValue : Number
@@ -53,7 +53,7 @@ The maximum gray value in the file.
 
 Class for loading and parsing PGM image files
 
-### fetchOptions
+### .fetchOptions
 
 ```js
 fetchOptions : Object = { credentials: 'same-origin' }
@@ -61,7 +61,7 @@ fetchOptions : Object = { credentials: 'same-origin' }
 
 Fetch options for loading the file.
 
-### load
+### .load
 
 ```js
 load( url : String ) : Promise<PGMResult>
@@ -70,7 +70,7 @@ load( url : String ) : Promise<PGMResult>
 Loads and parses the PGM file. The promise resolves with the returned
 data from the [parse](#PGMLoader#parse) function.
 
-### parse
+### .parse
 
 ```js
 parse( buffer : ArrayBuffer ) : PGMResult
@@ -85,19 +85,19 @@ Three.js implementation of PGMLoaderBase.
 
 _extends PGMLoaderBase_
 
-### manager
+### .manager
 
 ```js
 manager : LoadingManager = DefaultLoadingManager
 ```
 
-### constructor
+### .constructor
 
 ```js
 constructor( manager : LoadingManager = DefaultLoadingManager ) : void
 ```
 
-### load
+### .load
 
 ```js
 load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
@@ -106,7 +106,7 @@ load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
 Loads and parses the PGM file and returns a DataTexture. If a DataTexture is passed into
 the function the data is applied to it.
 
-### parse
+### .parse
 
 ```js
 parse( buffer : Uint8Array | ArrayBuffer, texture : DataTexture = new DataTexture() ) : DataTexture
