@@ -1,6 +1,6 @@
 # Frustum Meshes
 
-Set of simple telemetry primitives for drawing objects in the scene.
+Set of three.js mesh utilities for generating and rendering camera view volumes for traditional OpenGL-style frustums as well as distorted CAHVORE-style ones.
 
 # Use
 
