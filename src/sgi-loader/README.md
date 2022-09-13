@@ -22,7 +22,7 @@ loader
 
 ## SGIResult
 
-### name
+### .name
 
 ```js
 name : String
@@ -30,7 +30,7 @@ name : String
 
 The image name embedded in the file.
 
-### rle
+### .rle
 
 ```js
 rle : Boolean
@@ -38,7 +38,7 @@ rle : Boolean
 
 Whether the file is run length encoded or not.
 
-### dimension
+### .dimension
 
 ```js
 dimension : Number
@@ -46,7 +46,7 @@ dimension : Number
 
 The number of dimensions to the stored data.
 
-### width
+### .width
 
 ```js
 width : Number
@@ -54,7 +54,7 @@ width : Number
 
 The width of the sgi file in pixels.
 
-### height
+### .height
 
 ```js
 height : Number
@@ -62,7 +62,7 @@ height : Number
 
 The height of the sgi file in pixels.
 
-### channels
+### .channels
 
 ```js
 channels : Number
@@ -70,7 +70,7 @@ channels : Number
 
 The number of color channels stored in the image.
 
-### minValue
+### .minValue
 
 ```js
 minValue : Number
@@ -78,7 +78,7 @@ minValue : Number
 
 The minimum channel value in the file.
 
-### maxValue
+### .maxValue
 
 ```js
 maxValue : Number
@@ -86,7 +86,7 @@ maxValue : Number
 
 The maximum channel value in the file.
 
-### bytesPerChannel
+### .bytesPerChannel
 
 ```js
 bytesPerChannel : Number
@@ -94,7 +94,7 @@ bytesPerChannel : Number
 
 The amount of bytes used to represent a single color channel.
 
-### data
+### .data
 
 ```js
 data : Uint16Array | Uint8Array
@@ -107,7 +107,7 @@ of `width * channels * bytesPerChannel`.
 
 Class for loading Silicon Graphics Image files
 
-### fetchOptions
+### .fetchOptions
 
 ```js
 fetchOptions : Object = { credentials: 'same-origin' }
@@ -115,7 +115,7 @@ fetchOptions : Object = { credentials: 'same-origin' }
 
 Fetch options for loading the file.
 
-### load
+### .load
 
 ```js
 load( url : String ) : Promise<SGIResult>
@@ -124,7 +124,7 @@ load( url : String ) : Promise<SGIResult>
 Loads and parses the SGI file. The promise resolves with the returned
 data from the [parse](#SGILoaderBase#parse) function.
 
-### parse
+### .parse
 
 ```js
 parse( buffer : ArrayBuffer | Uint8Array ) : SGIResult
@@ -139,19 +139,19 @@ A three.js implementation of SGILoader that returns a data texture rather than r
 
 _extends SGILoaderBase_
 
-### manager
+### .manager
 
 ```js
 manager : LoadingManager = DefaultLoadingManager
 ```
 
-### constructor
+### .constructor
 
 ```js
 constructor( manager : LoadingManager = DefaultLoadingManager ) : void
 ```
 
-### load
+### .load
 
 ```js
 load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
@@ -160,7 +160,7 @@ load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
 Loads and parses the SGI file and returns a DataTexture. If a DataTexture is passed into
 the function the data is applied to it.
 
-### parse
+### .parse
 
 ```js
 parse( buffer : ArrayBuffer | Uint8Array, texture : DataTexture = new DataTexture() ) : DataTexture
