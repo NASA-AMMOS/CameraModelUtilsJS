@@ -5,87 +5,86 @@ Set of simple telemetry primitives for drawing objects in the scene.
 # Use
 
 ```js
-
+TODO
 ```
 
 # API
 
 ## CAHVOREOptions
 
-### width
+### .width
 
 ```js
 width : Number
 ```
 
-max number of pixels in width
+Number of pixels in width dimension in the camera model.
 
-### height
+### .height
 
 ```js
 height : Number
 ```
 
-max number of pixels in height
+Number of pixels in height dimension in the camera model.
 
-### C
+### .C
 
 ```js
 C : Vector3
 ```
 
-input model center
+"C" center vector for the camera model.
 
-### A
+### .A
 
 ```js
 A : Vector3
 ```
 
-input model axis
+"A" axis vector for the camera model.
 
-
-### H
+### .H
 
 ```js
 H : Vector3
 ```
 
-input model horiz
+"H" horizontal vector for the camera model.
 
-### V
+### .V
 
 ```js
 V : Vector3
 ```
 
-input model vert
+"V" vertical vector for the camera model.
 
-### O
+### .O
 
 ```js
 O : Vector3 | null = null
 ```
 
-input model optical axis, only required for CAHVORE
+"O" optical axis vector for the camera model. Only needed for CAHVOR / CAHVORE models.
 
-### R
+### .R
 
 ```js
 R : Vector3 | null = null
 ```
 
-radial-distortion, only required for CAHVORE
+"R" radial-distortion axis vector for the camera model. Only needed for CAHVOR / CAHVORE models.
 
-### E
+### .E
 
 ```js
 E : Vector3 | null = null
 ```
 
-entrance-pupil, only required for CAHVORE
+"E" entrance-pupil vector for the camera model. Only needed for CAHVORE models.
 
-### linearity
+### .linearity
 
 ```js
 linearity : Number = 1
