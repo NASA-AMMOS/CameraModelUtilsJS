@@ -6,25 +6,24 @@ Set of three.js mesh utilities for generating and rendering camera view volumes 
 
 ```js
 // initialize parameters for cahvore values
-const parameters = { ...cavoreModel };
+const parameters = { ...cahvoreModel };
 parameters.nearDist = 0.5;
 parameters.farDist = 15;
 
 // create the frustum
-const distortedFrustum = new FrustumMesh(
-	parameters,
-	new MeshPhongMaterial( {
-		transparent: true,
-		opacity: 0.25,
-	} )
-);
+const distortedFrustum = new FrustumMesh();
+distortedFrustum.setFromCAHVOREParameters( parameters );
+distortedFrustum.material = new MeshPhongMaterial( {
+	transparent: true,
+	opacity: 0.25,
+} );
 
 scene.add( distortedFrustum );
 ```
 
 # API
 
-## CAHVOREOptions
+## CAHVOREParameters
 
 Set of options for passing into the `Frustum` object to generate the distorted frustum.
 
@@ -116,8 +115,6 @@ near : Number = 0.085
 
 The projected distance for the near plane of the camera model frustum.
 
-TODO: change name in implementation
-
 ### .far
 
 ```js
@@ -125,8 +122,6 @@ far : Number = 10.0
 ```
 
 The projected distance for the far plane of the camera model frustum.
-
-TODO: change name in implementation
 
 ### .widthSegments
 
@@ -161,37 +156,27 @@ _extends Mesh_
 ### .constructor
 
 ```js
-constructor(
-	parameters : CAHVOREOptions = undefined,
-	material : Material = undefined
-) : void
+constructor( material : Material ) : void
 ```
 
-TODO (add parameters support)
-
-### .setParameters
+### .setFromCAHVOREParameters
 
 ```js
-setParameters( parameters : CAHVOREOptions ) : void
+setParameters( parameters : CAHVOREParameters ) : void
 ```
 
 Update the parameters of the distorted frustum geometry.
-
-## LinearFrustumMesh
-
-Create a linear camera frustum facing the -Z axis with X to the right and Y up.
-
-_extends Mesh_
 
 ### .setFromProjectionMatrix
 
 ```js
 setFromProjectionMatrix(
-	projectionMatrix : Matrix4, 
-	frame : Matrix4, 
-	near : Number, 
+	projectionMatrix : Matrix4,
+	frame : Matrix4,
+	near : Number,
 	far : Number
 ) : void
 ```
 
-Updates the linear frustum view based on the provided projection matrix, camera transform frame, near, and far values.
+Updates the linear frustum view based on the provided projection matrix, camera transform frame, near, and far values. Creates a linear camera frustum facing the -Z axis with X to the right and Y up.
+

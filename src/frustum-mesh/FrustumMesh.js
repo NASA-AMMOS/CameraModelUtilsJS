@@ -1,5 +1,11 @@
-import { Ray, Vector3, BoxBufferGeometry, Mesh } from 'three';
+import { Ray, Vector3, BoxBufferGeometry, Mesh, Matrix4 } from 'three';
 import { getRay } from '../cahvore-utilities/index.js';
+
+const tempVec = new Vector3();
+const planeProjectedVec = new Vector3();
+const inverseMatrix = new Matrix4();
+const position = new Vector3();
+const tempRay = new Ray();
 
 /*
  * Update the positions in a frustum based on the parameters by calling the CAHV or CAHVORE conversion methods.
@@ -9,14 +15,9 @@ import { getRay } from '../cahvore-utilities/index.js';
  */
 function updateFrustumPositions( options, positions ) {
 
-	const position = new Vector3();
-	const tempRay = new Ray();
-	const tempOrigin = new Vector3();
-
 	// if projectEnds is true then the near and far distances for the rays
 	// are projected onto the near and far planes
 	const projectDirection = options.A.clone().normalize();
-	const projectEnds = false;
 
 	for ( let i = 0, l = positions.count; i < l; i ++ ) {
 
@@ -30,31 +31,29 @@ function updateFrustumPositions( options, positions ) {
 
 		getRay( options, position, tempRay );
 
-		// convert the projection array to a point on the near or far plane
-		if ( projectEnds ) {
+		// get the point at the given distance along the ray
+		tempRay.at( position.z < 0 ? options.near : options.far, tempVec );
 
-			const zSign = position.z < 0;
-			tempRay.direction.normalize();
-			tempRay.direction.multiplyScalar( 1 / tempRay.direction.dot( projectDirection ) );
-			tempOrigin.copy( tempRay.origin ).addScaledVector( tempRay.direction, zSign ? options.nearDist : options.farDist );
+		// get the plane-projected version of the near / far point
+		const zSign = position.z < 0;
+		tempRay.direction.normalize();
+		tempRay.direction.multiplyScalar( 1 / tempRay.direction.dot( projectDirection ) );
+		planeProjectedVec.copy( tempRay.origin ).addScaledVector( tempRay.direction, zSign ? options.near : options.far );
 
-		} else {
-
-			tempRay.at( position.z < 0 ? options.nearDist : options.farDist, tempOrigin );
-
-		}
+		// interpolate to the plane vector based on planar factor
+		tempVec.lerp( planeProjectedVec, options.planarProjectionFactor );
 
 		// set the position
-		positions.setXYZ( i, tempOrigin.x, tempOrigin.y, tempOrigin.z );
+		positions.setXYZ( i, tempVec.x, tempVec.y, tempVec.z );
 
 	}
 
 }
 
 /*
- * Create the geometry for the frustum. Takes CAHVOREOptions.
+ * Create the geometry for the frustum. Takes CAHVOREParameters.
  */
-function createFrustumGeometry( options ) {
+function createCAHVOREFrustumGeometry( options ) {
 
 	const geom = new BoxBufferGeometry( 1, 1, 1, options.widthSegments, options.heightSegments, 1 );
 	geom.translate( 0.5, 0.5, 0 );
@@ -69,8 +68,8 @@ function createFrustumGeometry( options ) {
 }
 
 /**
- * @typedef {Object} CAHVOREOptions
- * @param {('CAHV'|'CAHVOR','CAHVORE')} type CAHV or CAHVORE
+ * @typedef {Object} CAHVOREParameters
+ * @param {('CAHV'|'CAHVOR'|'CAHVORE')} type CAHV, CAHVOR, or CAHVORE
  * @param {Number} width max number of pixels in width
  * @param {Number} height max number of pixels in height
  * @param {Vector3} C input model center
@@ -81,10 +80,11 @@ function createFrustumGeometry( options ) {
  * @param {Vector3|null} [R=null] radial-distortion, only required for CAHVORE
  * @param {Vector3|null} [E=null] entrance-pupil, only required for CAHVORE
  * @param {Number} [linearity=1] linearity parameter, only required for CAHVORE
- * @param {Number} [nearDist=0.085] the distance between the camera model and the near plane
- * @param {Number} [farDist=10.0] the distance between the camera model and the far plane
- * @param {Number} [widthSegments=16] lthe number of segments to create along the x axis (all sides)
- * @param {Number} [heightSegments=16] lthe number of segments to create along the x axis (all sides)
+ * @param {Number} [near=0.085] the distance between the camera model and the near plane
+ * @param {Number} [far=10.0] the distance between the camera model and the far plane
+ * @param {Number} [widthSegments=16] the number of segments to create along the x axis (all sides)
+ * @param {Number} [heightSegments=16] the number of segments to create along the x axis (all sides)
+ * @param {Number} [planarProjectionFactor=0]
  */
 
 /**
@@ -100,22 +100,15 @@ export class FrustumMesh extends Mesh {
 	constructor( material ) {
 
 		super();
-
-		if ( material && ! material.isMaterial ) {
-
-			this.setParameters( arguments[ 0 ] );
-			material = arguments[ 1 ];
-
-		}
 		this.material = material || this.material;
 
 	}
 
 	/**
      * Update the parameters of the CAHVORE frustum geometry.
-     * @param {CAHVOREOptions} parameters
+     * @param {CAHVOREParameters} parameters
      */
-	setParameters( parameters ) {
+	setFromCAHVOREParameters( parameters ) {
 
 		const defaultedParams = {
 			type: 'CAHV',
@@ -130,15 +123,49 @@ export class FrustumMesh extends Mesh {
 			width: 1,
 			height: 1,
 
-			nearDist: 0.085,
-			farDist: 10.0,
+			near: 0.085,
+			far: 10.0,
 			widthSegments: 16,
 			heightSegments: 16,
+			planarProjectionFactor: 0,
 			...parameters,
 		};
 
 		this.geometry.dispose();
-		this.geometry = createFrustumGeometry( defaultedParams );
+		this.geometry = createCAHVOREFrustumGeometry( defaultedParams );
+
+	}
+
+	/**
+     * Updates the linear frustum view based on the provided projection matrix, frame, near, and far values.
+     * @param {Matrix4} projectionMatrix
+     * @param {Matrix4} frame
+     * @param {Number} near
+     * @param {Number} far
+     */
+	setFromProjectionMatrix( projectionMatrix, frame, near, far ) {
+
+		inverseMatrix.copy( projectionMatrix ).invert();
+
+		const geometry = new BoxBufferGeometry();
+		const posAttr = geometry.getAttribute( 'position' );
+
+		for ( let i = 0, l = posAttr.count; i < l; i ++ ) {
+
+			tempVec.fromBufferAttribute( posAttr, i ).multiplyScalar( 2.0 );
+			const zSign = Math.sign( tempVec.z );
+
+			tempVec.applyMatrix4( inverseMatrix );
+			tempVec.multiplyScalar( 1 / Math.abs( tempVec.z ) );
+
+			const dist = zSign < 0 ? far : near;
+			tempVec.multiplyScalar( dist );
+			posAttr.setXYZ( i, tempVec.x, tempVec.y, tempVec.z );
+
+		}
+
+		geometry.applyMatrix4( frame );
+		this.geometry = geometry;
 
 	}
 
