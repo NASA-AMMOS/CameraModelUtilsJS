@@ -2,7 +2,8 @@
 
 A class in the same form as the three.js loaders for loading and parsing [SGI images](http://paulbourke.net/dataformats/sgirgb/).
 
-!> Note that RLE parsing for 2 byte per channel images is untested.
+> **Note**
+> Note that RLE parsing for 2 byte per channel images is untested.
 
 # Use
 
