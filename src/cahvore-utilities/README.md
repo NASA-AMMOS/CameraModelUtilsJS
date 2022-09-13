@@ -1,6 +1,6 @@
 # CAHVORE Transformation Utilities
 
-Set of functions for converting a 2D camera coordinate to a camera ray ported from the [original C++ implementation](https://github.jpl.nasa.gov/telitwin/cmod/blob/master/model/cmod_cahv.c).
+Set of functions for converting a 2D camera coordinate to a camera ray ported from the [original C implementation](https://github.jpl.nasa.gov/telitwin/cmod/blob/master/model/cmod_cahv.c).
 
 Original implementation by Todd Litwin.
 
