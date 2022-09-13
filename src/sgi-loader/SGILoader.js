@@ -1,4 +1,4 @@
-import { SGILoaderBase } from '../base/SGILoaderBase.js';
+import { SGILoaderBase } from './SGILoaderBase.js';
 import {
 	DataTexture,
 	RGBAFormat,

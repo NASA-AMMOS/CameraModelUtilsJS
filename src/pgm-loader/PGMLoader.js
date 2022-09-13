@@ -1,4 +1,4 @@
-import { PGMLoaderBase } from '../base/PGMLoaderBase.js';
+import { PGMLoaderBase } from './PGMLoaderBase.js';
 import {
 	DataTexture,
 	DefaultLoadingManager,

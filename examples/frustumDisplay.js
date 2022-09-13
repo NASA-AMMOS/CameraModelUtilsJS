@@ -2,9 +2,26 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import URDFLoader from 'urdf-loader';
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { FrustumMesh, getLinearFrustumInfo, frameBoundsToProjectionMatrix } from '../src/index.js';
 
 let camera, scene, mesh, renderer, controls;
-let robot, light, ambient;
+let robot, light, ambient, cameraModels;
+let frustumGroup, distortedFrustum, distortedLines, minFrustum, maxFrustum;
+const tempFrustum = new FrustumMesh();
+
+const params = {
+
+	camera: 'MCAM_Z_RIGHT-Z026',
+	near: 0.2,
+	far: 3.5,
+	planarProjectionFactor: 0,
+	widthSegments: 16,
+	heightSegments: 16,
+	displayMinFrustum: false,
+	displayMaxFrustum: false,
+
+};
 
 init();
 
@@ -21,10 +38,60 @@ async function init() {
 	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 500 );
 	camera.position.set( 3, 3, - 3 );
 
 	scene = new THREE.Scene();
+
+	const ground = new THREE.Mesh(
+		new THREE.PlaneGeometry(),
+		new THREE.ShadowMaterial( {
+			opacity: 0.05,
+			color: 0xffffff,
+			depthWrite: false,
+		} ),
+	);
+	ground.rotation.x = - Math.PI / 2;
+	ground.scale.setScalar( 10 );
+	ground.receiveShadow = true;
+	ground.position.y = - 0.5;
+	scene.add( ground );
+
+	// frustum
+	frustumGroup = new THREE.Group();
+	scene.add( frustumGroup );
+
+	// distorted frustum
+	distortedFrustum = new FrustumMesh( new THREE.MeshPhongMaterial( {
+
+		transparent: true,
+		opacity: 0.1,
+		side: THREE.DoubleSide,
+		depthWrite: false,
+
+	} ) );
+	frustumGroup.add( distortedFrustum );
+
+	// distorted lines
+	distortedLines = new THREE.LineSegments(
+		new THREE.EdgesGeometry(),
+		new THREE.LineBasicMaterial(),
+	);
+	frustumGroup.add( distortedLines );
+
+	// min frustum
+	minFrustum = new THREE.LineSegments(
+		new THREE.EdgesGeometry(),
+		new THREE.LineBasicMaterial(),
+	);
+	frustumGroup.add( minFrustum );
+
+	// max frustum
+	maxFrustum = new THREE.LineSegments(
+		new THREE.EdgesGeometry(),
+		new THREE.LineBasicMaterial(),
+	);
+	frustumGroup.add( maxFrustum );
 
 	light = new THREE.DirectionalLight();
 	light.position.set( 3, 3, 3 );
@@ -39,7 +106,7 @@ async function init() {
 	shadowCam.updateProjectionMatrix();
 	scene.add( light );
 
-	ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+	ambient = new THREE.AmbientLight( 0xffffff, 0.2 );
 	scene.add( ambient );
 
 	const loader = new URDFLoader();
@@ -81,6 +148,24 @@ async function init() {
 
 	} );
 
+	fetch( 'https://raw.githubusercontent.com/nasa-jpl/m2020-urdf-models/main/m2020-camera-models.json' )
+		.then( res => res.json() )
+		.then( result => {
+
+			cameraModels = {};
+			result.forEach( c => {
+
+				cameraModels[ c.name ] = c;
+
+			} );
+
+			delete cameraModels.HELI_NAVCAM;
+			delete cameraModels.HELI_RTE_CAM;
+
+			buildGUI();
+
+		} );
+
 	controls = new OrbitControls( camera, renderer.domElement );
 
 	window.addEventListener( 'resize', () => {
@@ -93,8 +178,63 @@ async function init() {
 
 }
 
+function buildGUI() {
+
+	const gui = new GUI();
+	gui.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
+	gui.add( params, 'near', 0, 50 ).onChange( updateFrustums );
+	gui.add( params, 'far', 0, 50 ).onChange( updateFrustums );
+	gui.add( params, 'widthSegments', 2, 40 ).onChange( updateFrustums );
+	gui.add( params, 'heightSegments', 2, 40 ).onChange( updateFrustums );
+	gui.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
+	gui.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
+	gui.add( params, 'displayMinFrustum' );
+	gui.add( params, 'displayMaxFrustum' );
+
+	updateFrustums();
+
+}
+
+function updateFrustums() {
+
+	// TODO: simplify
+	const model = cameraModels[ params.camera ];
+	const m = { ...model, ...model.model };
+	for ( const key in m ) {
+
+		if ( Array.isArray( m[ key ] ) ) m[ key ] = new THREE.Vector3( ...m[ key ] );
+
+	}
+
+	m.near = params.near;
+	m.far = params.far;
+	m.widthSegments = params.widthSegments;
+	m.heightSegments = params.heightSegments;
+	m.planarProjectionFactor = params.planarProjectionFactor;
+	distortedFrustum.setFromCahvoreParameters( m );
+
+	distortedLines.geometry.dispose();
+	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 45 );
+
+	// generate the frustums
+	const minMatrix = new THREE.Matrix4();
+	const maxMatrix = new THREE.Matrix4();
+	const linearInfo = getLinearFrustumInfo( m );
+	frameBoundsToProjectionMatrix( linearInfo.minFrameBounds, params.near, params.far, minMatrix );
+	frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, maxMatrix );
+
+	tempFrustum.setFromProjectionMatrix( minMatrix, linearInfo.frame, params.near, params.far );
+	minFrustum.geometry.dispose();
+	minFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 45 );
+
+	tempFrustum.setFromProjectionMatrix( maxMatrix, linearInfo.frame, params.near, params.far );
+	maxFrustum.geometry.dispose();
+	maxFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 45 );
+
+}
+
 // animation
-function animation( time ) {
+function animation( time, ...args ) {
 
 	if ( robot ) {
 
@@ -117,7 +257,22 @@ function animation( time ) {
 
 		} );
 
+		if ( cameraModels ) {
+
+			robot.updateMatrixWorld();
+			const frame = cameraModels[ params.camera ].frame;
+			robot.frames[ frame ].matrixWorld.decompose(
+				frustumGroup.position,
+				frustumGroup.quaternion,
+				frustumGroup.scale,
+			);
+
+		}
+
 	}
+
+	minFrustum.visible = params.displayMinFrustum;
+	maxFrustum.visible = params.displayMaxFrustum;
 
 	renderer.render( scene, camera );
 

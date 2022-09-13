@@ -22,7 +22,7 @@ import { Vector3, Ray, Plane, Matrix4, Vector2 } from 'three';
  */
 export function getRay( model, sample, outRay ) {
 
-	switch ( model.type ) {
+	switch ( model.type.toUpperCase() ) {
 
 		case 'CAHVORE':
 			cmod_cahvore_2d_to_3d_general(
