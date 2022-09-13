@@ -26,6 +26,8 @@ scene.add( distortedFrustum );
 
 ## CAHVOREOptions
 
+Set of options for passing into the `Frustum` object to generate the distorted frustum.
+
 ### .width
 
 ```js
