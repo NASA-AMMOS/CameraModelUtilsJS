@@ -5,7 +5,16 @@ Set of simple telemetry primitives for drawing objects in the scene.
 # Use
 
 ```js
-TODO
+// initialize parameters for cahvore values
+const parameters = { ...cavoreModel };
+parameters.nearDist = 0.5;
+parameters.farDist = 15;
+
+const distortedFrustum = new FrustumMesh();
+distortedFrustum.setParameters( parameters );
+distortedFrustum.material = new MeshPhongMaterial();
+
+scene.add( distortedFrustum );
 ```
 
 # API
@@ -92,21 +101,25 @@ linearity : Number = 1
 
 Linearity parameter. Only required for CAHVORE models.
 
-### ,nearDist
+### .near
 
 ```js
-nearDist : Number = 0.085
+near : Number = 0.085
 ```
 
 The projected distance for the near plane of the camera model frustum.
 
-### ,farDist
+TODO: change name in implementation
+
+### .far
 
 ```js
-farDist : Number = 10.0
+far : Number = 10.0
 ```
 
 The projected distance for the far plane of the camera model frustum.
+
+TODO: change name in implementation
 
 ### .widthSegments
 
