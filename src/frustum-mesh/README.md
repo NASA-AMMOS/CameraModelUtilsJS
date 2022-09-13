@@ -134,13 +134,21 @@ widthSegments : Number = 16
 
 The number of segments to create along the x axis on all sides.
 
-### heightSegments
+### .heightSegments
 
 ```js
 heightSegments : Number = 16
 ```
 
 The number of segments to create along the y axis on all sides.
+
+### .planarProjectionFactor
+
+```js
+planarProjectionFactor : Number = 0
+```
+
+Value in the range [0, 1]. Indicates how much the ends will be projected to be planar rather than rounded on the near and far ends.
 
 ## FrustumMesh
 
