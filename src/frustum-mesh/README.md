@@ -12,7 +12,7 @@ parameters.farDist = 15;
 
 // create the frustum
 const distortedFrustum = new FrustumMesh();
-distortedFrustum.setFromCAHVOREParameters( parameters );
+distortedFrustum.setFromCahvoreParameters( parameters );
 distortedFrustum.material = new MeshPhongMaterial( {
 	transparent: true,
 	opacity: 0.25,
@@ -23,7 +23,7 @@ scene.add( distortedFrustum );
 
 # API
 
-## CAHVOREParameters
+## CahvoreParameters
 
 Set of options for passing into the `Frustum` object to generate the distorted frustum.
 
@@ -149,9 +149,9 @@ Value in the range [0, 1]. Indicates how much the ends will be projected to be p
 
 ## FrustumMesh
 
-Frustum shape mesh for depicting the view volume of a camera.
-
 _extends Mesh_
+
+Frustum shape mesh for depicting the view volume of a camera.
 
 ### .constructor
 
@@ -159,10 +159,10 @@ _extends Mesh_
 constructor( material : Material ) : void
 ```
 
-### .setFromCAHVOREParameters
+### .setFromCahvoreParameters
 
 ```js
-setParameters( parameters : CAHVOREParameters ) : void
+setParameters( parameters : CahvoreParameters ) : void
 ```
 
 Update the parameters of the distorted frustum geometry. This will generate a frustum distorted by the camera model settings.

@@ -7,7 +7,25 @@ Original implementation by Todd Litwin.
 # Use
 
 ```js
-TODO
+// get the projected bounds info.
+const modelInfo = getLinearFrustumInfo( cahvoreModel );
+
+// retrieves the linear frustum inscribed in the frustum formed by
+// the minimum points inside the distorted frustum shape and specified
+// in the modelInfo.frame.
+const minFrustum = new Matrix4();
+frameBoundsToProjectionMatrix( modelInfo.minFrameBounds, 0.1, 15.0, minFrustum );
+
+// retrieves the linear frustum circumscribed on the frustum formed by
+// the maximum points inside the distorted frustum shape and specified
+// in the modelInfo.frame.
+const maxFrustum = new Matrix4();
+frameBoundsToProjectionMatrix( modelInfo.maxFrameBounds, 0.1, 15.0, maxFrustum );
+
+// retrieves the ray distorted by the model at the given point
+const ray = new Ray();
+const imageCoord = new Vector2( modelInfo.width * 0.5, modelInfo.height * 0.5 );
+getRay( cahvoreModel, imageCoord, ray );
 ```
 
 # API
@@ -18,16 +36,16 @@ TODO
 
 ```js
 cmod_cahvore_2d_to_3d_general(
-	pos2 : Vector2, 
-	linearity : Number, 
-	c : Vector3, 
-	a : Vector3, 
-	h : Vector3, 
-	v : Vector3, 
-	o : Vector3, 
-	r : Vector3, 
-	e : Vector3, 
-	pos3 : Vector3 = null, 
+	pos2 : Vector2,
+	linearity : Number,
+	c : Vector3,
+	a : Vector3,
+	h : Vector3,
+	v : Vector3,
+	o : Vector3,
+	r : Vector3,
+	e : Vector3,
+	pos3 : Vector3 = null,
 	uvec3 : Vector3 = null
 ) : { pos3, uvec3 }
 ```
@@ -40,12 +58,12 @@ This function projects a 2D image point out into 3D using the camera model param
 
 ```js
 cmod_cahv_2d_to_3d(
-	pos2 : Vector2, 
-	c : Vector3, 
-	a : Vector3, 
-	h : Vector3, 
-	v : Vector3, 
-	pos3 : Vector3 = null, 
+	pos2 : Vector2,
+	c : Vector3,
+	a : Vector3,
+	h : Vector3,
+	v : Vector3,
+	pos3 : Vector3 = null,
 	uvec3 : Vector3 = null
 ) : { pos3, uvec3 }
 ```
@@ -58,14 +76,14 @@ Uses the Yakimovsky & Cunningham camera model known locally as CAHV. This functi
 
 ```js
 cmod_cahvor_2d_to_3d(
-	pos2 : Vector2, 
-	c : Vector3, 
-	a : Vector3, 
-	h : Vector3, 
-	v : Vector3, 
-	o : Vector3, 
-	r : Vector3, 
-	pos3 : Vector3 = null, 
+	pos2 : Vector2,
+	c : Vector3,
+	a : Vector3,
+	h : Vector3,
+	v : Vector3,
+	o : Vector3,
+	r : Vector3,
+	pos3 : Vector3 = null,
 	uvec3 : Vector3 = null
 ) : { pos3, uvec3 }
 ```
@@ -82,6 +100,8 @@ getRay( model : Object, sample : Vector2, outRay : Ray ) : void
 
 Returns the outgoing ray from the camera model given an image sample coordinate. Internally calls the appropriate camera model to ray function.
 
+The "sample" vector is in pixel values that must fall within the model.width and model.height.
+
 ### getLinearFrustumInfo
 
 ```js
@@ -94,9 +114,9 @@ Function takes a camera model and returns an object describing the resulting loc
 
 ```js
 frameBoundsToProjectionMatrix(
-	frameBounds : FrameBounds, 
-	near : Number, 
-	far : Number, 
+	frameBounds : FrameBounds,
+	near : Number,
+	far : Number,
 	target : Matrix4
 ) : target
 ```
@@ -154,3 +174,17 @@ maxFrameBounds : FrameBounds
 ```
 
 The bounds that completely encompass the cahvore model at the maximum extents 1m out in the given frame.
+
+## CahvoreDistortionMaterial
+
+_extends THREE.ShaderMaterial_
+
+
+
+### Uniforms
+
+```js
+{
+	TODO
+}
+```

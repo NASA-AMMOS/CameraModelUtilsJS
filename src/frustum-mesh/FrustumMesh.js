@@ -51,9 +51,9 @@ function updateFrustumPositions( options, positions ) {
 }
 
 /*
- * Create the geometry for the frustum. Takes CAHVOREParameters.
+ * Create the geometry for the frustum. Takes CahvoreParameters.
  */
-function createCAHVOREFrustumGeometry( options ) {
+function createCahvoreFrustumGeometry( options ) {
 
 	const geom = new BoxBufferGeometry( 1, 1, 1, options.widthSegments, options.heightSegments, 1 );
 	geom.translate( 0.5, 0.5, 0 );
@@ -68,7 +68,7 @@ function createCAHVOREFrustumGeometry( options ) {
 }
 
 /**
- * @typedef {Object} CAHVOREParameters
+ * @typedef {Object} CahvoreParameters
  * @param {('CAHV'|'CAHVOR'|'CAHVORE')} type CAHV, CAHVOR, or CAHVORE
  * @param {Number} width max number of pixels in width
  * @param {Number} height max number of pixels in height
@@ -106,9 +106,9 @@ export class FrustumMesh extends Mesh {
 
 	/**
      * Update the parameters of the CAHVORE frustum geometry.
-     * @param {CAHVOREParameters} parameters
+     * @param {CahvoreParameters} parameters
      */
-	setFromCAHVOREParameters( parameters ) {
+	setFromCahvoreParameters( parameters ) {
 
 		const defaultedParams = {
 			type: 'CAHV',
@@ -132,7 +132,7 @@ export class FrustumMesh extends Mesh {
 		};
 
 		this.geometry.dispose();
-		this.geometry = createCAHVOREFrustumGeometry( defaultedParams );
+		this.geometry = createCahvoreFrustumGeometry( defaultedParams );
 
 	}
 
