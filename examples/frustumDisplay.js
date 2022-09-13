@@ -193,10 +193,9 @@ function buildGUI() {
 	const frustumSettings = gui.addFolder( 'frustum' );
 	frustumSettings.add( params, 'near', 0, 50 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'far', 0, 50 ).onChange( updateFrustums );
-	frustumSettings.add( params, 'widthSegments', 2, 40 ).onChange( updateFrustums );
-	frustumSettings.add( params, 'heightSegments', 2, 40 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'widthSegments', 2, 40, 1 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'heightSegments', 2, 40, 1 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
-
 
 	updateFrustums();
 
