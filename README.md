@@ -18,7 +18,7 @@ Project for loading PGM image format files into a three.js data texture.
 
 Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum geometry.
 
-[Cahvore Functions and Distortion Shader](./src/cahvore-utilities/)
+[CAHVORE Functions and Distortion Shader](./src/cahvore-utilities/)
 
 Three.js Javascript port of functions for retreiving distorted CAHVORE rays, calculating three.js frames and frustums, and rendering CAHVORE-distorted rendered images.
 
