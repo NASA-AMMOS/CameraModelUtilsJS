@@ -90,31 +90,31 @@ E : Vector3 | null = null
 linearity : Number = 1
 ```
 
-linearity parameter, only required for CAHVORE
+Linearity parameter. Only required for CAHVORE models.
 
-### nearDist
+### ,nearDist
 
 ```js
 nearDist : Number = 0.085
 ```
 
-the distance between the camera model and the near plane
+The projected distance for the near plane of the camera model frustum.
 
-### farDist
+### ,farDist
 
 ```js
 farDist : Number = 10.0
 ```
 
-the distance between the camera model and the far plane
+The projected distance for the far plane of the camera model frustum.
 
-### widthSegments
+### .widthSegments
 
 ```js
 widthSegments : Number = 16
 ```
 
-the number of segments to create along the x axis (all sides)
+The number of segments to create along the x axis on all sides.
 
 ### heightSegments
 
@@ -122,37 +122,37 @@ the number of segments to create along the x axis (all sides)
 heightSegments : Number = 16
 ```
 
-the number of segments to create along the x axis (all sides)
+The number of segments to create along the y axis on all sides.
 
 ## FrustumMesh
 
-Frustum for depicting the view volume of a camera.
-This will be transformed using CAHV or CAHVORE settings.
+Frustum for depicting the view volume of a camera. This will be transformed using the camera model settings.
 
 _extends Mesh_
 
-### constructor
+### .constructor
 
 ```js
-constructor( material : Material ) : void
+constructor( parameters : CAHVOREOptions = undefined, material : Material = undefined ) : void
 ```
 
-### setParameters
+TODO (add parameters support)
+
+### .setParameters
 
 ```js
 setParameters( parameters : CAHVOREOptions ) : void
 ```
 
-Update the parameters of the CAHVORE frustum geometry.
+Update the parameters of the distorted frustum geometry.
 
 ## LinearFrustumMesh
 
-Create a linear camera frustum facing the -Z axis with X
-to the right and Y up.
+Create a linear camera frustum facing the -Z axis with X to the right and Y up.
 
 _extends Mesh_
 
-### setFromProjectionMatrix
+### .setFromProjectionMatrix
 
 ```js
 setFromProjectionMatrix(
@@ -163,4 +163,4 @@ setFromProjectionMatrix(
 ) : void
 ```
 
-Updates the linear frustum view based on the provided projection matrix, frame, near, and far values.
+Updates the linear frustum view based on the provided projection matrix, camera transform frame, near, and far values.
