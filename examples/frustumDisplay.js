@@ -5,13 +5,15 @@ import URDFLoader from 'urdf-loader';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { FrustumMesh, getLinearFrustumInfo, frameBoundsToProjectionMatrix } from '../src/index.js';
 
-let camera, scene, mesh, renderer, controls;
+let camera, scene, renderer, controls, clock;
 let robot, light, ambient, cameraModels;
 let frustumGroup, distortedFrustum, distortedLines, minFrustum, maxFrustum;
+let time = 0;
 const tempFrustum = new FrustumMesh();
 
 const params = {
 
+	animate: true,
 	camera: 'MCAM_Z_RIGHT-Z026',
 	near: 0.2,
 	far: 3.5,
@@ -40,6 +42,8 @@ async function init() {
 
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 500 );
 	camera.position.set( 3, 3, - 3 );
+
+	clock = new THREE.Clock();
 
 	scene = new THREE.Scene();
 
@@ -181,15 +185,18 @@ async function init() {
 function buildGUI() {
 
 	const gui = new GUI();
+	gui.add( params, 'animate' );
 	gui.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
-	gui.add( params, 'near', 0, 50 ).onChange( updateFrustums );
-	gui.add( params, 'far', 0, 50 ).onChange( updateFrustums );
-	gui.add( params, 'widthSegments', 2, 40 ).onChange( updateFrustums );
-	gui.add( params, 'heightSegments', 2, 40 ).onChange( updateFrustums );
-	gui.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
-	gui.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
 	gui.add( params, 'displayMinFrustum' );
 	gui.add( params, 'displayMaxFrustum' );
+
+	const frustumSettings = gui.addFolder( 'frustum' );
+	frustumSettings.add( params, 'near', 0, 50 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'far', 0, 50 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'widthSegments', 2, 40 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'heightSegments', 2, 40 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
+
 
 	updateFrustums();
 
@@ -234,12 +241,19 @@ function updateFrustums() {
 }
 
 // animation
-function animation( time, ...args ) {
+function animation() {
+
+	const delta = clock.getDelta();
+	if ( params.animate ) {
+
+		time += delta;
+
+	}
 
 	if ( robot ) {
 
 		const { mapLinear, pingpong, clamp, DEG2RAD } = THREE.MathUtils;
-		const t = pingpong( time * 0.0002, 1 );
+		const t = pingpong( time * 0.2, 1 );
 		const mastAnim = clamp( mapLinear( t, 0.2, 0.3, 0, 1 ), 0, 1 );
 		const joint1Anim = clamp( mapLinear( t, 0.55, 0.65, 0, 1 ), 0, 1 );
 		const joint3Anim = clamp( mapLinear( t, 0.4, 0.5, 0, 1 ), 0, 1 );
