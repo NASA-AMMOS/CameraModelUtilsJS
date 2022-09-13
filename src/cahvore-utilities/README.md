@@ -4,6 +4,12 @@ Set of functions for converting a 2D camera coordinate to a camera ray ported fr
 
 Original implementation by Todd Litwin.
 
+# Use
+
+```js
+TODO
+```
+
 # API
 
 ## Functions
