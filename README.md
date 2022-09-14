@@ -10,9 +10,7 @@ Series of packages for visualizing and rendering images and frustum shapes based
 
 [Rendering Camera View with Distortion](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/distortionPreview.html)
 
-## Packages
-
-### Distorted Camera Frustums
+## Package Docs
 
 [CAHVORE Functions and Distortion Shader](./src/cahvore-utilities/)
 
@@ -21,8 +19,6 @@ Three.js Javascript port of functions for retreiving distorted CAHVORE rays, cal
 [Frustum Meshes](./src/frustum-mesh/)
 
 Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum geometry.
-
-### Image Product Loaders
 
 [SGI Loader](./src/sgi-loader/)
 
