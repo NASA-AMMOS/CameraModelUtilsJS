@@ -10,12 +10,12 @@ let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pas
 let frustumGroup, tiltGroup, frustumMesh, frustumLines, stencilGroup;
 let time = 0;
 const RENDER_SCALE = 0.5;
+const TERRAIN_RENDER_ORDER = - 10;
 const SRGB_CLEAR_COLOR = 0x11161C;
 const LINEAR_CLEAR_COLOR = new THREE.Color( SRGB_CLEAR_COLOR ).convertSRGBToLinear().getHex();
 
 // TODO:
 // - cleanup
-// - stencil
 // - max 50% width
 
 const params = {
@@ -30,6 +30,9 @@ const params = {
 	far: 200,
 	planarProjectionFactor: 0,
 	displayCameraHelper: false,
+
+	showTint: true,
+	showVolume: true,
 
 };
 
@@ -48,12 +51,16 @@ async function init() {
 	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 500 );
+	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	camera.position.set( - 6, 6, 6 ).multiplyScalar( 5 );
 
 	clock = new THREE.Clock();
 
 	scene = new THREE.Scene();
+
+	// lights
+	light = new THREE.DirectionalLight();
+	light.position.set( 3, 3, 3 );
 
 	// frustum
 	frustumGroup = new THREE.Group();
@@ -137,8 +144,8 @@ async function init() {
 	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
 
 		color: 0xffffff,
-		opacity: 0.075,
-		blending: THREE.CustomBlending,
+		opacity: 0.15,
+		blending: THREE.AdditiveBlending,
 
 		depthTest: false,
 		depthWrite: false,
@@ -152,31 +159,41 @@ async function init() {
 		stencilZPass: THREE.ReplaceStencilOp,
 
 	} ) ) );
+
 	stencilGroup.children.forEach( ( child, index ) => {
 
-		child.renderOrder = index + 1;
+		child.renderOrder = TERRAIN_RENDER_ORDER + index + 1;
 
 	} );
 	tiltGroup.add( stencilGroup );
-
-
-
-	light = new THREE.DirectionalLight();
-	light.position.set( 3, 3, 3 );
 
 	tilesGroup = new THREE.Group();
 	tilesGroup.rotation.x = Math.PI / 2;
 	tilesGroup.position.y = - 1;
 	scene.add( tilesGroup );
 
-	tiles = new TilesRenderer( 'https://raw.githubusercontent.com/NASA-AMMOS/3DTilesSampleData/master/msl-dingo-gap/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_colorize_tileset.json' );
+	const loadTileCallback = scene => {
 
+		scene.traverse( c => {
+
+			if ( c.isMesh ) {
+
+				c.renderOrder = TERRAIN_RENDER_ORDER;
+
+			}
+
+		} );
+
+	};
+
+	tiles = new TilesRenderer( 'https://raw.githubusercontent.com/NASA-AMMOS/3DTilesSampleData/master/msl-dingo-gap/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_colorize_tileset.json' );
 	tiles.fetchOptions.mode = 'cors';
 	tiles.lruCache.minSize = 900;
 	tiles.lruCache.maxSize = 1300;
 	tiles.errorTarget = 12;
 	tiles.setCamera( camera );
 	tiles.setCamera( frustumCamera );
+	tiles.onLoadModel = loadTileCallback;
 	tilesGroup.add( tiles.group );
 
 	skyTiles = new TilesRenderer( 'https://raw.githubusercontent.com/NASA-AMMOS/3DTilesSampleData/master/msl-dingo-gap/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_sky/0528_0260184_to_s64o256_sky_tileset.json' );
@@ -187,6 +204,7 @@ async function init() {
 	skyTiles.errorTarget = 12;
 	skyTiles.setCamera( camera );
 	skyTiles.setCamera( frustumCamera );
+	skyTiles.onLoadModel = loadTileCallback;
 	tilesGroup.add( skyTiles.group );
 
 	// rendering
@@ -238,6 +256,8 @@ function buildGUI() {
 	const frustumSettings = gui.addFolder( 'frustum' );
 	frustumSettings.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
 	frustumSettings.add( params, 'rendering', [ 'distorted', 'minimum', 'maximum', 'checkerboard' ] ).onChange( updateFrustums );
+	frustumSettings.add( params, 'showTint' );
+	frustumSettings.add( params, 'showVolume' );
 	frustumSettings.add( params, 'near', 0.01, 250 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'far', 0.01, 250 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'tilt', - 0.5, 0.5 ).onChange( updateFrustums );
@@ -334,7 +354,7 @@ function updateFrustums() {
 	);
 
 	pass.material.checkerboard = params.rendering === 'checkerboard';
-	pass.material.passthrough = params.passthrough === 'minimum' || params.rendering === 'maximum';
+	pass.material.passthrough = params.rendering === 'minimum' || params.rendering === 'maximum';
 	pass.material.setFromCameraModel( m );
 	updateRenderTarget();
 
@@ -349,6 +369,10 @@ function animation() {
 		time += delta;
 
 	}
+
+	stencilGroup.visible = params.showTint;
+	frustumLines.visible = params.showVolume;
+	frustumMesh.visible = params.showVolume;
 
 	// toggle the camera helper
 	cameraHelper.update();
