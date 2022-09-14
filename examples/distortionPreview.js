@@ -2,18 +2,21 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import { FrustumMesh, getLinearFrustumInfo, frameBoundsToProjectionMatrix } from '../src/index.js';
+import { FrustumMesh, getLinearFrustumInfo, frameBoundsToProjectionMatrix, CahvoreDistortionMaterial } from '../src/index.js';
 import { TilesRenderer } from '3d-tiles-renderer';
 
-let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper;
+let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper, frameEl;
 let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pass;
 let frustumGroup, tiltGroup, distortedFrustum, distortedLines, minFrustum, maxFrustum;
 let time = 0;
 const RENDER_SCALE = 0.5;
+const SRGB_CLEAR_COLOR = 0x11161C;
+const LINEAR_CLEAR_COLOR = new THREE.Color( SRGB_CLEAR_COLOR ).convertSRGBToLinear().getHex();
 
 // TODO:
 // - cleanup
 // - stencil
+// - max 50% width
 
 const params = {
 
@@ -34,9 +37,11 @@ init();
 // init
 async function init() {
 
+	frameEl = document.getElementById( 'frame' );
+
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor( 0x11161C );
+	renderer.setClearColor( SRGB_CLEAR_COLOR );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.outputEncoding = THREE.sRGBEncoding;
 	renderer.shadowMap.enabled = true;
@@ -127,8 +132,13 @@ async function init() {
 	tilesGroup.add( skyTiles.group );
 
 	// rendering
-	renderTarget = new THREE.WebGLRenderTarget( 1, 1 );
-	pass = new FullScreenQuad( new THREE.MeshBasicMaterial );
+	renderTarget = new THREE.WebGLRenderTarget( 1, 1, {
+		generateMipmaps: true,
+		minFilter: THREE.LinearMipMapLinearFilter,
+		magFilter: THREE.LinearMipMapLinearFilter,
+	} );
+	console.log
+	pass = new FullScreenQuad( new CahvoreDistortionMaterial( { map: renderTarget.texture } ) );
 
 	ambient = new THREE.AmbientLight( 0xffffff, 0.2 );
 	scene.add( ambient );
@@ -165,10 +175,10 @@ function buildGUI() {
 	const gui = new GUI();
 	gui.add( params, 'animate' );
 	gui.add( params, 'fullscreen' ).onChange( updateRenderTarget );
-	gui.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
 	gui.add( params, 'displayCameraHelper' );
 
 	const frustumSettings = gui.addFolder( 'frustum' );
+	frustumSettings.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
 	frustumSettings.add( params, 'rendering', [ 'distorted', 'minimum', 'maximum', 'checkerboard' ] ).onChange( updateFrustums );
 	frustumSettings.add( params, 'near', 0.01, 250 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'far', 0.01, 250 ).onChange( updateFrustums );
@@ -201,8 +211,8 @@ function updateRenderTarget() {
 
 	// TODO: must use the max bounds here for the render aspect
 	renderTarget.setSize(
-		height * dpr * aspect * upscaleRatio,
-		height * dpr * upscaleRatio,
+		Math.ceil( height * dpr * aspect * upscaleRatio ),
+		Math.ceil( height * dpr * upscaleRatio ),
 	);
 
 }
@@ -242,7 +252,7 @@ function updateFrustums() {
 	}
 
 	distortedLines.geometry.dispose();
-	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 35 );
+	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 10 );
 
 	frustumCamera.projectionMatrix.copy( matrix );
 	frustumCamera.projectionMatrixInverse.copy( matrix ).invert();
@@ -251,6 +261,11 @@ function updateFrustums() {
 		frustumCamera.quaternion,
 		frustumCamera.scale,
 	);
+
+	pass.material.checkerboard = params.rendering === 'checkerboard';
+	pass.material.passthrough = params.passthrough === 'minimum' || params.rendering === 'maximum';
+	pass.material.setFromCameraModel( m );
+	updateRenderTarget();
 
 }
 
@@ -285,9 +300,11 @@ function animation() {
 
 	// render the scene to the target
 	scene.updateMatrixWorld();
+	renderer.setClearColor( LINEAR_CLEAR_COLOR );
 	renderer.setRenderTarget( renderTarget );
 	renderer.render( tilesGroup, frustumCamera );
 	renderer.setRenderTarget( null );
+	renderer.setClearColor( SRGB_CLEAR_COLOR );
 
 	if ( params.fullscreen && cameraModels ) {
 
@@ -312,8 +329,9 @@ function animation() {
 		}
 
 		renderer.setViewport( marginX, marginY, w, h );
-		renderer.render( tilesGroup, frustumCamera );
+		pass.render( renderer );
 		renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+		frameEl.style.visibility = 'hidden';
 
 	} else {
 
@@ -323,28 +341,22 @@ function animation() {
 
 			const model = cameraModels[ params.camera ];
 			const aspect = model.model.width / model.model.height;
+			const w = Math.ceil( window.innerHeight * aspect * RENDER_SCALE );
+			const h = Math.ceil( window.innerHeight * RENDER_SCALE );
 
-			// render the scene
-			// renderer.setRenderTarget( renderTarget );
-			// renderer.render( tilesGroup, frustumCamera );
-			// renderTarget.setRenderTarget( null );
-
-			const w = window.innerHeight * aspect * RENDER_SCALE;
-			const h = window.innerHeight * RENDER_SCALE;
-
-			renderer.setViewport( 0, 0, w, h );
-			renderer.setScissor( 0, 0, w, h );
+			renderer.setViewport( 1, 1, w, h );
+			renderer.setScissor( 1, 1, w, h );
 			renderer.setScissorTest( true );
-
-			renderer.render( tilesGroup, frustumCamera );
-
+			pass.render( renderer );
 			renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
 			renderer.setScissorTest( false );
+
+			frameEl.style.width = `${ w }px`;
+			frameEl.style.height = `${ h }px`;
+			frameEl.style.visibility = 'visible';
 
 		}
 
 	}
-
-
 
 }

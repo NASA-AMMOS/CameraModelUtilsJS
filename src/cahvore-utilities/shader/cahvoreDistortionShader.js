@@ -30,7 +30,7 @@ export const cahvoreUnprojectShader = {
 
 	defines: {
 		MODEL_TYPE: CAHVORE,
-		DISPLAY_GRID: 0,
+		CHECKERBOARD: 0,
 		PASSTHROUGH: 0,
 	},
 
@@ -85,7 +85,7 @@ export const cahvoreUnprojectShader = {
                 vec3 rayOrigin, rayDirection;
 
                 // WebGL camera 0,0 is bottom left while CAHVORE 0,0 is top left
-                vec2 imageCoord = vec2(vUv.x, 1.0 - vUv.y) * vec2(imageWidth, imageHeight);
+                vec2 imageCoord = vec2( vUv.x, 1.0 - vUv.y ) * vec2( imageWidth, imageHeight );
 
                 // get the ray associated with the image-space x, y value
                 #if MODEL_TYPE == CAHV
@@ -120,20 +120,22 @@ export const cahvoreUnprojectShader = {
                 sampleCoord.xy += vec2(1.0);
                 sampleCoord.xy *= 0.5;
 
-                #if DISPLAY_GRID
+                #if CHECKERBOARD
 
                     bool checker = true;
                     sampleCoord *= 10.0;
 
-                    if (int(sampleCoord.x) % 2 == 0) {
-                        checker = !checker;
+                    if ( int( sampleCoord.x ) % 2 == 0 ) {
+
+                        checker = ! checker;
                     }
 
-                    if (int(sampleCoord.y) % 2 == 0) {
-                        checker = !checker;
+                    if ( int( sampleCoord.y ) % 2 == 0 ) {
+                        checker = ! checker;
                     }
 
-                    gl_FragColor = vec4(checker);
+                    gl_FragColor = vec4( checker );
+					gl_FragColor.a = 1.0;
 
                 #else
 
@@ -143,6 +145,10 @@ export const cahvoreUnprojectShader = {
                 #endif
 
             #endif
+
+			#include <encodings_fragment>
+			#include <tonemapping_fragment>
+
         }
     `,
 };

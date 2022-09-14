@@ -4,6 +4,40 @@ import { getLinearFrustumInfo, frameBoundsToProjectionMatrix } from './utils.js'
 
 export class CahvoreDistortionMaterial extends ShaderMaterial {
 
+	get checkerboard() {
+
+		return Boolean( this.defines.CHECKERBOARD );
+
+	}
+	set checkerboard( value ) {
+
+		const v = Number( value );
+		if ( this.defines.CHECKERBOARD !== v ) {
+
+			this.defines.CHECKERBOARD = v;
+			this.needsUpdate = true;
+
+		}
+
+	}
+
+	get passthrough() {
+
+		return Boolean( this.defines.PASSTHROUGH );
+
+	}
+	set passthrough( value ) {
+
+		const v = Number( value );
+		if ( this.defines.PASSTHROUGH !== v ) {
+
+			this.defines.PASSTHROUGH = v;
+			this.needsUpdate = true;
+
+		}
+
+	}
+
 	constructor( parameters ) {
 
 		super( cahvoreUnprojectShader );
@@ -77,7 +111,7 @@ export class CahvoreDistortionMaterial extends ShaderMaterial {
 					this.setModelType( CAHVORE );
 					break;
 				default:
-					throw new Error( `CahvoreUnprojectMaterial: Camera model type ${modelType} not supported` );
+					throw new Error( `CahvoreDistortionMaterial: Camera model type ${ modelType } not supported` );
 
 			}
 
