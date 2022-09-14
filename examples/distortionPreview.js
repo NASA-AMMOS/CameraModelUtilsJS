@@ -7,7 +7,7 @@ import { TilesRenderer } from '3d-tiles-renderer';
 
 let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper, frameEl;
 let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pass;
-let frustumGroup, tiltGroup, frustumMesh, frustumLines;
+let frustumGroup, tiltGroup, frustumMesh, frustumLines, stencilGroup;
 let time = 0;
 const RENDER_SCALE = 0.5;
 const SRGB_CLEAR_COLOR = 0x11161C;
@@ -49,7 +49,7 @@ async function init() {
 	document.body.appendChild( renderer.domElement );
 
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 500 );
-	camera.position.set( 6, 6, - 6 );
+	camera.position.set( - 6, 6, 6 ).multiplyScalar( 5 );
 
 	clock = new THREE.Clock();
 
@@ -87,6 +87,79 @@ async function init() {
 		new THREE.LineBasicMaterial(),
 	);
 	tiltGroup.add( frustumLines );
+
+	// stencil group
+	stencilGroup = new THREE.Group();
+	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
+
+		depthTest: false,
+		depthWrite: false,
+		colorWrite: false,
+		side: THREE.BackSide,
+		stencilWrite: true,
+		stencilZFail: THREE.DecrementWrapStencilOp,
+		stencilZPass: THREE.DecrementWrapStencilOp,
+
+	} ) ) );
+	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
+
+		depthTest: false,
+		depthWrite: false,
+		colorWrite: false,
+		side: THREE.FrontSide,
+		stencilWrite: true,
+		stencilZFail: THREE.IncrementWrapStencilOp,
+		stencilZPass: THREE.IncrementWrapStencilOp,
+
+	} ) ) );
+	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
+
+		depthTest: true,
+		depthWrite: false,
+		colorWrite: false,
+		side: THREE.BackSide,
+		stencilWrite: true,
+		stencilZFail: THREE.KeepStencilOp,
+		stencilZPass: THREE.IncrementWrapStencilOp,
+
+	} ) ) );
+	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
+
+		depthTest: true,
+		depthWrite: false,
+		colorWrite: false,
+		side: THREE.FrontSide,
+		stencilWrite: true,
+		stencilZFail: THREE.KeepStencilOp,
+		stencilZPass: THREE.DecrementWrapStencilOp,
+
+	} ) ) );
+	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
+
+		color: 0xffffff,
+		opacity: 0.075,
+		blending: THREE.CustomBlending,
+
+		depthTest: false,
+		depthWrite: false,
+		side: THREE.BackSide,
+		stencilWrite: true,
+		stencilRef: 0,
+		stencilFunc: THREE.NotEqualStencilFunc,
+		stencilFail: THREE.ReplaceStencilOp,
+		stencilZFail: THREE.ReplaceStencilOp,
+		stencilPass: THREE.ReplaceStencilOp,
+		stencilZPass: THREE.ReplaceStencilOp,
+
+	} ) ) );
+	stencilGroup.children.forEach( ( child, index ) => {
+
+		child.renderOrder = index + 1;
+
+	} );
+	tiltGroup.add( stencilGroup );
+
+
 
 	light = new THREE.DirectionalLight();
 	light.position.set( 3, 3, 3 );
@@ -159,6 +232,7 @@ function buildGUI() {
 	const gui = new GUI();
 	gui.add( params, 'animate' );
 	gui.add( params, 'fullscreen' ).onChange( updateRenderTarget );
+	gui.add( params, 'stretchCompensation' ).onChange( updateRenderTarget );
 	gui.add( params, 'displayCameraHelper' );
 
 	const frustumSettings = gui.addFolder( 'frustum' );
@@ -244,6 +318,12 @@ function updateFrustums() {
 
 	frustumLines.geometry.dispose();
 	frustumLines.geometry = new THREE.EdgesGeometry( frustumMesh.geometry, 10 );
+
+	stencilGroup.children.forEach( child => {
+
+		child.geometry = frustumMesh.geometry;
+
+	} );
 
 	frustumCamera.projectionMatrix.copy( matrix );
 	frustumCamera.projectionMatrixInverse.copy( matrix ).invert();
