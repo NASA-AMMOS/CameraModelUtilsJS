@@ -205,7 +205,7 @@ _extends THREE.ShaderMaterial_
 
 ```js
 {
-	// the render target rendered with the
+	// the render target rendered with the maximum view render to apply distortion to
 	map = null : Texture
 }
 ```
