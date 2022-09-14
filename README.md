@@ -12,6 +12,8 @@ Series of packages for visualizing and rendering images and frustum shapes based
 
 ## Packages
 
+### Distorted Camera Frustums
+
 [CAHVORE Functions and Distortion Shader](./src/cahvore-utilities/)
 
 Three.js Javascript port of functions for retreiving distorted CAHVORE rays, calculating three.js frames and frustums, and rendering CAHVORE-distorted rendered images.
@@ -19,6 +21,8 @@ Three.js Javascript port of functions for retreiving distorted CAHVORE rays, cal
 [Frustum Meshes](./src/frustum-mesh/)
 
 Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum geometry.
+
+### Image Product Loaders
 
 [SGI Loader](./src/sgi-loader/)
 
