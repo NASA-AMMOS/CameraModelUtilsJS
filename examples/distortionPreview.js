@@ -7,7 +7,7 @@ import { TilesRenderer } from '3d-tiles-renderer';
 
 let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper, frameEl;
 let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pass;
-let frustumGroup, tiltGroup, distortedFrustum, distortedLines, minFrustum, maxFrustum;
+let frustumGroup, tiltGroup, frustumMesh, frustumLines;
 let time = 0;
 const RENDER_SCALE = 0.5;
 const SRGB_CLEAR_COLOR = 0x11161C;
@@ -24,6 +24,7 @@ const params = {
 	fullscreen: false,
 	tilt: - 0.25,
 	camera: 'HAZFLA',
+	stretchCompensation: true,
 	rendering: 'distorted',
 	near: 0.2,
 	far: 200,
@@ -44,8 +45,6 @@ async function init() {
 	renderer.setClearColor( SRGB_CLEAR_COLOR );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.outputEncoding = THREE.sRGBEncoding;
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
@@ -72,7 +71,7 @@ async function init() {
 	scene.add( cameraHelper );
 
 	// distorted frustum
-	distortedFrustum = new FrustumMesh( new THREE.MeshPhongMaterial( {
+	frustumMesh = new FrustumMesh( new THREE.MeshPhongMaterial( {
 
 		transparent: true,
 		opacity: 0.1,
@@ -80,28 +79,14 @@ async function init() {
 		depthWrite: false,
 
 	} ) );
-	tiltGroup.add( distortedFrustum );
+	tiltGroup.add( frustumMesh );
 
 	// distorted lines
-	distortedLines = new THREE.LineSegments(
+	frustumLines = new THREE.LineSegments(
 		new THREE.EdgesGeometry(),
 		new THREE.LineBasicMaterial(),
 	);
-	tiltGroup.add( distortedLines );
-
-	// min frustum
-	minFrustum = new THREE.LineSegments(
-		new THREE.EdgesGeometry(),
-		new THREE.LineBasicMaterial(),
-	);
-	tiltGroup.add( minFrustum );
-
-	// max frustum
-	maxFrustum = new THREE.LineSegments(
-		new THREE.EdgesGeometry(),
-		new THREE.LineBasicMaterial(),
-	);
-	tiltGroup.add( maxFrustum );
+	tiltGroup.add( frustumLines );
 
 	light = new THREE.DirectionalLight();
 	light.position.set( 3, 3, 3 );
@@ -135,9 +120,7 @@ async function init() {
 	renderTarget = new THREE.WebGLRenderTarget( 1, 1, {
 		generateMipmaps: true,
 		minFilter: THREE.LinearMipMapLinearFilter,
-		magFilter: THREE.LinearMipMapLinearFilter,
 	} );
-	console.log
 	pass = new FullScreenQuad( new CahvoreDistortionMaterial( { map: renderTarget.texture } ) );
 
 	ambient = new THREE.AmbientLight( 0xffffff, 0.2 );
@@ -165,6 +148,7 @@ async function init() {
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
+		updateRenderTarget();
 
 	} );
 
@@ -204,12 +188,19 @@ function updateRenderTarget() {
 	const { minFrameBounds, maxFrameBounds } = getLinearFrustumInfo( m );
 	const minHeight = minFrameBounds.top - minFrameBounds.bottom;
 	const maxHeight = maxFrameBounds.top - maxFrameBounds.bottom;
-	const upscaleRatio = maxHeight / minHeight;
-	const aspect = m.width / m.height;
+	const minWidth = minFrameBounds.right - minFrameBounds.left;
+	const maxWidth = maxFrameBounds.right - maxFrameBounds.left;
+
+	let upscaleRatio = 1;
+	if ( params.stretchCompensation ) {
+
+		upscaleRatio = Math.max( maxHeight / minHeight, maxWidth / minWidth );
+
+	}
+
+	const aspect = maxWidth / maxHeight;
 	const dpr = window.devicePixelRatio;
 	const height = params.fullscreen ? window.innerHeight : window.innerHeight * RENDER_SCALE;
-
-	// TODO: must use the max bounds here for the render aspect
 	renderTarget.setSize(
 		Math.ceil( height * dpr * aspect * upscaleRatio ),
 		Math.ceil( height * dpr * upscaleRatio ),
@@ -234,25 +225,25 @@ function updateFrustums() {
 	if ( params.rendering === 'minimum' ) {
 
 		frameBoundsToProjectionMatrix( linearInfo.minFrameBounds, params.near, params.far, matrix );
-		distortedFrustum.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
+		frustumMesh.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
 
 	} else if ( params.rendering === 'maximum' ) {
 
 		frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, matrix );
-		distortedFrustum.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
+		frustumMesh.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
 
 	} else {
 
 		m.near = params.near;
 		m.far = params.far;
 		m.planarProjectionFactor = params.planarProjectionFactor;
-		distortedFrustum.setFromCahvoreParameters( m );
+		frustumMesh.setFromCahvoreParameters( m );
 		frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, matrix );
 
 	}
 
-	distortedLines.geometry.dispose();
-	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 10 );
+	frustumLines.geometry.dispose();
+	frustumLines.geometry = new THREE.EdgesGeometry( frustumMesh.geometry, 10 );
 
 	frustumCamera.projectionMatrix.copy( matrix );
 	frustumCamera.projectionMatrixInverse.copy( matrix ).invert();
@@ -279,27 +270,28 @@ function animation() {
 
 	}
 
+	// toggle the camera helper
 	cameraHelper.update();
 	cameraHelper.visible = params.displayCameraHelper;
 
+	// adjust the frustum animation
 	frustumGroup.rotation.z = Math.sin( time * 0.25 ) * 0.5 - 0.5;
 	tiltGroup.rotation.y = params.tilt;
 
+	// update the scene and camera for rendering and tiles update
+	scene.updateMatrixWorld();
 	camera.updateMatrixWorld();
 
+	// update tiles
 	tiles.setResolutionFromRenderer( camera, renderer );
-	tiles.setResolutionFromRenderer( frustumCamera, renderer );
+	tiles.setResolution( frustumCamera, renderTarget.texture.image.width, renderTarget.texture.image.height );
 	tiles.update();
 
 	skyTiles.setResolutionFromRenderer( camera, renderer );
-	skyTiles.setResolutionFromRenderer( frustumCamera, renderer );
+	skyTiles.setResolution( frustumCamera, renderTarget.texture.image.width, renderTarget.texture.image.height );
 	skyTiles.update();
 
-	minFrustum.visible = params.displayMinFrustum;
-	maxFrustum.visible = params.displayMaxFrustum;
-
 	// render the scene to the target
-	scene.updateMatrixWorld();
 	renderer.setClearColor( LINEAR_CLEAR_COLOR );
 	renderer.setRenderTarget( renderTarget );
 	renderer.render( tilesGroup, frustumCamera );
@@ -308,10 +300,12 @@ function animation() {
 
 	if ( params.fullscreen && cameraModels ) {
 
-		const model = cameraModels[ params.camera ];
-		const aspect = model.model.width / model.model.height;
+		// render in full screen mode
+		const camera = cameraModels[ params.camera ];
+		const aspect = camera.model.width / camera.model.height;
 		const windowAspect = window.innerWidth / window.innerHeight;
 
+		// set the display based on image aspect ratio
 		let w, h;
 		let marginX = 0, marginY = 0;
 		if ( aspect < windowAspect ) {
@@ -328,6 +322,7 @@ function animation() {
 
 		}
 
+		// render the distorted view
 		renderer.setViewport( marginX, marginY, w, h );
 		pass.render( renderer );
 		renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
@@ -335,10 +330,13 @@ function animation() {
 
 	} else {
 
+		// render the scene
 		renderer.render( scene, camera );
 
+		// render the picture in picture
 		if ( cameraModels ) {
 
+			// TODO: scale this to be the 50% max on each dimension
 			const model = cameraModels[ params.camera ];
 			const aspect = model.model.width / model.model.height;
 			const w = Math.ceil( window.innerHeight * aspect * RENDER_SCALE );
