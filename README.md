@@ -12,6 +12,14 @@ Series of packages for visualizing and rendering images and frustum shapes based
 
 ## Packages
 
+[CAHVORE Functions and Distortion Shader](./src/cahvore-utilities/)
+
+Three.js Javascript port of functions for retreiving distorted CAHVORE rays, calculating three.js frames and frustums, and rendering CAHVORE-distorted rendered images.
+
+[Frustum Meshes](./src/frustum-mesh/)
+
+Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum geometry.
+
 [SGI Loader](./src/sgi-loader/)
 
 Project for loading Silicon Graphics image format files into a three.js data texture.
@@ -19,14 +27,6 @@ Project for loading Silicon Graphics image format files into a three.js data tex
 [PGM Loader](./src/pgm-loader/)
 
 Project for loading PGM image format files into a three.js data texture.
-
-[Frustum Meshes](./src/frustum-mesh/)
-
-Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum geometry.
-
-[CAHVORE Functions and Distortion Shader](./src/cahvore-utilities/)
-
-Three.js Javascript port of functions for retreiving distorted CAHVORE rays, calculating three.js frames and frustums, and rendering CAHVORE-distorted rendered images.
 
 # LICENSE
 
