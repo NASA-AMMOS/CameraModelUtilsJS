@@ -191,8 +191,8 @@ function buildGUI() {
 	gui.add( params, 'displayMaxFrustum' );
 
 	const frustumSettings = gui.addFolder( 'frustum' );
-	frustumSettings.add( params, 'near', 0, 50 ).onChange( updateFrustums );
-	frustumSettings.add( params, 'far', 0, 50 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'near', 0.01, 50 ).onChange( updateFrustums );
+	frustumSettings.add( params, 'far', 0.01, 50 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'widthSegments', 2, 40, 1 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'heightSegments', 2, 40, 1 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'planarProjectionFactor', 0, 1 ).onChange( updateFrustums );
@@ -220,7 +220,7 @@ function updateFrustums() {
 	distortedFrustum.setFromCahvoreParameters( m );
 
 	distortedLines.geometry.dispose();
-	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 45 );
+	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 35 );
 
 	// generate the frustums
 	const minMatrix = new THREE.Matrix4();
@@ -231,11 +231,11 @@ function updateFrustums() {
 
 	tempFrustum.setFromProjectionMatrix( minMatrix, linearInfo.frame, params.near, params.far );
 	minFrustum.geometry.dispose();
-	minFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 45 );
+	minFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 35 );
 
 	tempFrustum.setFromProjectionMatrix( maxMatrix, linearInfo.frame, params.near, params.far );
 	maxFrustum.geometry.dispose();
-	maxFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 45 );
+	maxFrustum.geometry = new THREE.EdgesGeometry( tempFrustum.geometry, 35 );
 
 }
 
