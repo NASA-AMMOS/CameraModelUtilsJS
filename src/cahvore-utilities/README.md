@@ -210,6 +210,22 @@ _extends THREE.ShaderMaterial_
 }
 ```
 
+### .passthrough
+
+```js
+passthrough = false : Boolean
+```
+
+If true then the "map" value is rendered as passthrough with no distortion applied.
+
+### .checkerboard
+
+```js
+checkerboard = false : Boolean
+```
+
+If true then a checkerboard modeling the distortion is rendered.
+
 ### .setFromCameraModel
 
 ```js
