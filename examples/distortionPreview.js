@@ -23,7 +23,7 @@ const params = {
 	animate: true,
 	fullscreen: false,
 	tilt: - 0.25,
-	camera: 'NAVL',
+	camera: 'HAZFLA',
 	rendering: 'distorted',
 	near: 0.2,
 	far: 200,
