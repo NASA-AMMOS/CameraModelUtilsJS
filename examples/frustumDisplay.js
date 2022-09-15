@@ -30,6 +30,7 @@ init();
 // init
 async function init() {
 
+	// renderer init
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x11161C );
@@ -40,6 +41,7 @@ async function init() {
 	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
+	// init camera
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 500 );
 	camera.position.set( 3, 3, - 3 );
 
@@ -47,6 +49,7 @@ async function init() {
 
 	scene = new THREE.Scene();
 
+	// shadow catcher
 	const ground = new THREE.Mesh(
 		new THREE.PlaneGeometry(),
 		new THREE.ShadowMaterial( {
@@ -97,6 +100,7 @@ async function init() {
 	);
 	frustumGroup.add( maxFrustum );
 
+	// lighting
 	light = new THREE.DirectionalLight();
 	light.position.set( 3, 3, 3 );
 	light.castShadow = true;
@@ -113,6 +117,7 @@ async function init() {
 	ambient = new THREE.AmbientLight( 0xffffff, 0.2 );
 	scene.add( ambient );
 
+	// load the model
 	const loader = new URDFLoader();
 	loader.loadMeshCb = function( path, manager, onComplete ) {
 
@@ -152,6 +157,7 @@ async function init() {
 
 	} );
 
+	// camera models
 	fetch( 'https://raw.githubusercontent.com/nasa-jpl/m2020-urdf-models/main/m2020-camera-models.json' )
 		.then( res => res.json() )
 		.then( result => {
@@ -186,11 +192,11 @@ function buildGUI() {
 
 	const gui = new GUI();
 	gui.add( params, 'animate' );
-	gui.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
 	gui.add( params, 'displayMinFrustum' );
 	gui.add( params, 'displayMaxFrustum' );
 
 	const frustumSettings = gui.addFolder( 'frustum' );
+	frustumSettings.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
 	frustumSettings.add( params, 'near', 0.01, 50 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'far', 0.01, 50 ).onChange( updateFrustums );
 	frustumSettings.add( params, 'widthSegments', 2, 40, 1 ).onChange( updateFrustums );
@@ -212,6 +218,7 @@ function updateFrustums() {
 
 	}
 
+	// init the cahvore frustum volume
 	m.near = params.near;
 	m.far = params.far;
 	m.widthSegments = params.widthSegments;
@@ -222,7 +229,7 @@ function updateFrustums() {
 	distortedLines.geometry.dispose();
 	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 35 );
 
-	// generate the frustums
+	// generate the linear frustums
 	const minMatrix = new THREE.Matrix4();
 	const maxMatrix = new THREE.Matrix4();
 	const linearInfo = getLinearFrustumInfo( m );
@@ -251,6 +258,7 @@ function animation() {
 
 	if ( robot ) {
 
+		// animate the rover joints
 		const { mapLinear, pingpong, clamp, DEG2RAD } = THREE.MathUtils;
 		const t = pingpong( time * 0.2, 1 );
 		const mastAnim = clamp( mapLinear( t, 0.2, 0.3, 0, 1 ), 0, 1 );
@@ -270,6 +278,7 @@ function animation() {
 
 		} );
 
+		// update the frustum position
 		if ( cameraModels ) {
 
 			robot.updateMatrixWorld();

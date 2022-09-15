@@ -1,4 +1,4 @@
-import { Ray, Vector3, BoxBufferGeometry, Mesh, Matrix4 } from 'three';
+import { Ray, Vector3, BoxGeometry, Mesh, Matrix4 } from 'three';
 import { getRay } from '../cahvore-utilities/index.js';
 
 const tempVec = new Vector3();
@@ -55,7 +55,7 @@ function updateFrustumPositions( options, positions ) {
  */
 function createCahvoreFrustumGeometry( options ) {
 
-	const geom = new BoxBufferGeometry( 1, 1, 1, options.widthSegments, options.heightSegments, 1 );
+	const geom = new BoxGeometry( 1, 1, 1, options.widthSegments, options.heightSegments, 1 );
 	geom.translate( 0.5, 0.5, 0 );
 
 	const positions = geom.getAttribute( 'position' );
@@ -147,7 +147,7 @@ export class FrustumMesh extends Mesh {
 
 		inverseMatrix.copy( projectionMatrix ).invert();
 
-		const geometry = new BoxBufferGeometry();
+		const geometry = new BoxGeometry();
 		const posAttr = geometry.getAttribute( 'position' );
 
 		for ( let i = 0, l = posAttr.count; i < l; i ++ ) {
