@@ -9,28 +9,24 @@ let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper, frame
 let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pass;
 let frustumGroup, tiltGroup, frustumMesh, frustumLines, stencilGroup;
 let time = 0;
-const RENDER_SCALE = 0.5;
+const PIP_RENDER_SCALE = 0.5;
 const TERRAIN_RENDER_ORDER = - 10;
 const SRGB_CLEAR_COLOR = 0x11161C;
 const LINEAR_CLEAR_COLOR = new THREE.Color( SRGB_CLEAR_COLOR ).convertSRGBToLinear().getHex();
-
-// TODO:
-// - cleanup
-// - max 50% width
 
 const params = {
 
 	animate: true,
 	fullscreen: false,
-	tilt: - 0.25,
-	camera: 'HAZFLA',
 	stretchCompensation: true,
+	displayCameraHelper: false,
+
+	camera: 'HAZFLA',
 	rendering: 'distorted',
 	near: 0.2,
 	far: 200,
 	planarProjectionFactor: 0,
-	displayCameraHelper: false,
-
+	tilt: - 0.25,
 	showTint: true,
 	showVolume: true,
 
@@ -41,8 +37,10 @@ init();
 // init
 async function init() {
 
+	// get the picture in picture frame
 	frameEl = document.getElementById( 'frame' );
 
+	// init the renderer
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( SRGB_CLEAR_COLOR );
@@ -51,6 +49,7 @@ async function init() {
 	renderer.setAnimationLoop( animation );
 	document.body.appendChild( renderer.domElement );
 
+	// init the camera
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	camera.position.set( - 6, 6, 6 ).multiplyScalar( 5 );
 
@@ -61,6 +60,10 @@ async function init() {
 	// lights
 	light = new THREE.DirectionalLight();
 	light.position.set( 3, 3, 3 );
+	scene.add( light );
+
+	ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+	scene.add( ambient );
 
 	// frustum
 	frustumGroup = new THREE.Group();
@@ -95,7 +98,7 @@ async function init() {
 	);
 	tiltGroup.add( frustumLines );
 
-	// stencil group
+	// stencil group for terrain tinting
 	stencilGroup = new THREE.Group();
 	stencilGroup.add( new THREE.Mesh( undefined, new THREE.MeshBasicMaterial( {
 
@@ -160,6 +163,7 @@ async function init() {
 
 	} ) ) );
 
+	// ensure the stencil operations render after the terrain but before the other objects in the scene
 	stencilGroup.children.forEach( ( child, index ) => {
 
 		child.renderOrder = TERRAIN_RENDER_ORDER + index + 1;
@@ -167,11 +171,13 @@ async function init() {
 	} );
 	tiltGroup.add( stencilGroup );
 
+	// init the terrain
 	tilesGroup = new THREE.Group();
 	tilesGroup.rotation.x = Math.PI / 2;
 	tilesGroup.position.y = - 1;
 	scene.add( tilesGroup );
 
+	// callback for setting the render order on each object
 	const loadTileCallback = scene => {
 
 		scene.traverse( c => {
@@ -207,16 +213,18 @@ async function init() {
 	skyTiles.onLoadModel = loadTileCallback;
 	tilesGroup.add( skyTiles.group );
 
-	// rendering
+	// render target and distortion material init
 	renderTarget = new THREE.WebGLRenderTarget( 1, 1, {
 		generateMipmaps: true,
 		minFilter: THREE.LinearMipMapLinearFilter,
 	} );
-	pass = new FullScreenQuad( new CahvoreDistortionMaterial( { map: renderTarget.texture } ) );
+	pass = new FullScreenQuad(
+		new CahvoreDistortionMaterial( {
+			map: renderTarget.texture,
+		} ),
+	);
 
-	ambient = new THREE.AmbientLight( 0xffffff, 0.2 );
-	scene.add( ambient );
-
+	// load the camera models
 	fetch( 'https://raw.githubusercontent.com/nasa-jpl/m2020-urdf-models/main/m2020-camera-models.json' )
 		.then( res => res.json() )
 		.then( result => {
@@ -279,12 +287,14 @@ function updateRenderTarget() {
 
 	}
 
+	// get the width and height differences
 	const { minFrameBounds, maxFrameBounds } = getLinearFrustumInfo( m );
 	const minHeight = minFrameBounds.top - minFrameBounds.bottom;
 	const maxHeight = maxFrameBounds.top - maxFrameBounds.bottom;
 	const minWidth = minFrameBounds.right - minFrameBounds.left;
 	const maxWidth = maxFrameBounds.right - maxFrameBounds.left;
 
+	// compute a upscale ratio to compensate for stretching in the distortion stage
 	let upscaleRatio = 1;
 	if ( params.stretchCompensation ) {
 
@@ -294,10 +304,11 @@ function updateRenderTarget() {
 
 	const aspect = maxWidth / maxHeight;
 	const dpr = window.devicePixelRatio;
-	const height = params.fullscreen ? window.innerHeight : window.innerHeight * RENDER_SCALE;
+	const height = window.innerHeight;
+	const pipFactor = params.fullscreen ? 1 : PIP_RENDER_SCALE;
 	renderTarget.setSize(
-		Math.ceil( height * dpr * aspect * upscaleRatio ),
-		Math.ceil( height * dpr * upscaleRatio ),
+		Math.ceil( pipFactor * height * dpr * aspect * upscaleRatio ),
+		Math.ceil( pipFactor * height * dpr * upscaleRatio ),
 	);
 
 }
@@ -318,16 +329,19 @@ function updateFrustums() {
 	const linearInfo = getLinearFrustumInfo( m );
 	if ( params.rendering === 'minimum' ) {
 
+		// set the frustum shape based on the minimum linear frustum
 		frameBoundsToProjectionMatrix( linearInfo.minFrameBounds, params.near, params.far, matrix );
 		frustumMesh.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
 
 	} else if ( params.rendering === 'maximum' ) {
 
+		// set the frustum shape based on the maximum linear frustum
 		frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, matrix );
 		frustumMesh.setFromProjectionMatrix( matrix, linearInfo.frame, params.near, params.far );
 
 	} else {
 
+		// set the frustum shape based on the CAHVORE parameters
 		m.near = params.near;
 		m.far = params.far;
 		m.planarProjectionFactor = params.planarProjectionFactor;
@@ -336,15 +350,18 @@ function updateFrustums() {
 
 	}
 
+	// update the frustum lines
 	frustumLines.geometry.dispose();
 	frustumLines.geometry = new THREE.EdgesGeometry( frustumMesh.geometry, 10 );
 
+	// update the stencil geometry
 	stencilGroup.children.forEach( child => {
 
 		child.geometry = frustumMesh.geometry;
 
 	} );
 
+	// position and update the rendering camera
 	frustumCamera.projectionMatrix.copy( matrix );
 	frustumCamera.projectionMatrixInverse.copy( matrix ).invert();
 	linearInfo.frame.decompose(
@@ -353,9 +370,11 @@ function updateFrustums() {
 		frustumCamera.scale,
 	);
 
+	// update the distortion material
 	pass.material.checkerboard = params.rendering === 'checkerboard';
 	pass.material.passthrough = params.rendering === 'minimum' || params.rendering === 'maximum';
 	pass.material.setFromCameraModel( m );
+
 	updateRenderTarget();
 
 }
@@ -370,6 +389,7 @@ function animation() {
 
 	}
 
+	// visibility update
 	stencilGroup.visible = params.showTint;
 	frustumLines.visible = params.showVolume;
 	frustumMesh.visible = params.showVolume;
@@ -440,11 +460,16 @@ function animation() {
 		// render the picture in picture
 		if ( cameraModels ) {
 
-			// TODO: scale this to be the 50% max on each dimension
 			const model = cameraModels[ params.camera ];
 			const aspect = model.model.width / model.model.height;
-			const w = Math.ceil( window.innerHeight * aspect * RENDER_SCALE );
-			const h = Math.ceil( window.innerHeight * RENDER_SCALE );
+			let w = Math.ceil( window.innerHeight * aspect * PIP_RENDER_SCALE );
+			let h = Math.ceil( window.innerHeight * PIP_RENDER_SCALE );
+			if ( w > window.innerWidth * PIP_RENDER_SCALE ) {
+
+				w = Math.ceil( window.innerWidth * PIP_RENDER_SCALE );
+				h = Math.ceil( window.innerWidth * PIP_RENDER_SCALE / aspect );
+
+			}
 
 			renderer.setViewport( 1, 1, w, h );
 			renderer.setScissor( 1, 1, w, h );
