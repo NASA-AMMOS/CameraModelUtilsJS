@@ -119,7 +119,8 @@ export class PGMLoaderBase {
 		}
 
 		// check file identifier
-		if ( readString( 2 ) !== 'P5' ) {
+		const identifier = readString( 2 );
+		if ( identifier !== 'P5' && identifier !== 'P2' ) {
 
 			throw new Error( 'PGMLoader: Invalid file identifier' );
 
@@ -134,18 +135,27 @@ export class PGMLoaderBase {
 
 		for ( let i = 0; i < MAX_ITERATIONS; i ++ ) {
 
-			header += readStringUntil( c => /[\s\n\r]/g.test( c ) );
-			header += readString( 1 );
+			const readContent = readStringUntil( c => /[\s\n\r#]/g.test( c ) );
+			header += readContent;
+
+			const delineator = readString( 1 );
+			if ( delineator === '#' ) {
+
+				// comment
+				readStringUntil( c => /[\n\r]/g.test( c ) );
+
+			} else {
+
+				header += delineator;
+
+			}
 
 			headerTokens = header
 
-			// remove comments
-				.replace( /#[^\n\r]*[\n\r]/g, '' )
-
-			// tokenize
+				// tokenize
 				.split( /\s+/g )
 
-			// remove empty tokens
+				// remove empty tokens
 				.filter( t => !! t );
 
 			if ( headerTokens.length === 3 ) {
@@ -166,31 +176,47 @@ export class PGMLoaderBase {
 		const height = parseInt( headerTokens[ 1 ] );
 		const maxValue = parseInt( headerTokens[ 2 ] );
 		const byteLen = maxValue < 256 ? 1 : 2;
-
-		if ( width * height * byteLen !== buffer.byteLength - currIndex ) {
-
-			throw new Error( 'PGMLoader: Invalid data length' );
-
-		}
-
 		let data;
-		if ( byteLen === 1 ) {
 
-			data = new Uint8Array( buffer, currIndex, width * height );
+		if ( identifier === 'P5' ) {
+
+			if ( width * height * byteLen !== buffer.byteLength - currIndex ) {
+
+				throw new Error( 'PGMLoader: Invalid data length' );
+
+			}
+
+			if ( byteLen === 1 ) {
+
+				data = new Uint8Array( buffer, currIndex, width * height );
+
+			} else {
+
+				// Uint16Array cannot have an offset index that is not a
+				// multiple of 2 so copy the data buffer here to its own
+				// separate buffer
+				const dataBuffer = buffer.slice( currIndex, currIndex + width * height * 2 );
+
+				// TODO: Handle endianness properly. We can't guarantee what the byte order of the file is
+				// or what the byte order of the javascript platform is.
+				// The expected endianness is flipped
+				swapByteOrder( dataBuffer );
+
+				data = new Uint16Array( dataBuffer );
+
+			}
 
 		} else {
 
-			// Uint16Array cannot have an offset index that is not a
-			// multiple of 2 so copy the data buffer here to its own
-			// separate buffer
-			const dataBuffer = buffer.slice( currIndex, currIndex + width * height * 2 );
+			data = byteLen === 1 ? new Uint8Array( width * height ) : Uint16Array( width * height );
 
-			// TODO: Handle endianness properly. We can't guarantee what the byte order of the file is
-			// or what the byte order of the javascript platform is.
-			// The expected endianness is flipped
-			swapByteOrder( dataBuffer );
+			const remainingContent = readString( buffer.byteLength - currIndex );
+			const parsed = remainingContent.split( /[\s\n\r]+/g );
+			for ( let i = 0, l = width * height; i < l; i ++ ) {
 
-			data = new Uint16Array( dataBuffer );
+				data[ i ] = parseFloat( parsed[ i ] );
+
+			}
 
 		}
 
