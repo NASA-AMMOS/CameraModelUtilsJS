@@ -5,9 +5,10 @@ import {
 	UnsignedByteType,
 	HalfFloatType,
 	sRGBEncoding,
-	LuminanceFormat,
 	LinearFilter,
 	LinearMipMapLinearFilter,
+	RGBAFormat,
+	LinearEncoding,
 } from 'three';
 
 /**
@@ -35,27 +36,28 @@ export class PGMLoader extends PGMLoaderBase {
 	 * the function the data is applied to it.
 	 * @param {String} url
 	 * @param {DataTexture} texture
-	 * @returns {DataTexture}
+	 * @returns {Promise<DataTexture>}
 	 */
 	load( url, texture = new DataTexture() ) {
 
 		const manager = this.manager;
 		manager.itemStart( url );
-		super.load( url ).then( result => {
+		return super.load( url ).then( result => {
 
 			texture.copy( result );
 			texture.needsUpdate = true;
+			return texture;
 
 		} ).catch( err => {
 
 			manager.itemError( url, err );
+			throw err;
 
 		} ).finally( () => {
 
 			manager.itemEnd( url );
 
 		} );
-		return texture;
 
 	}
 
@@ -75,15 +77,27 @@ export class PGMLoader extends PGMLoaderBase {
 
 		}
 
+		const data = result.data;
+		const rgbaBuffer = new data.constructor( data.length * 4 );
+		for ( let i = 0, l = data.length; i < l; i ++ ) {
+
+			const v = data[ i ];
+			rgbaBuffer[ i * 4 + 0 ] = v;
+			rgbaBuffer[ i * 4 + 1 ] = v;
+			rgbaBuffer[ i * 4 + 2 ] = v;
+			rgbaBuffer[ i * 4 + 3 ] = 1;
+
+		}
+
 		// TODO: if type if HalfFloatType then do the values need to be normalized by maxValue?
 		texture.image.width = result.width;
 		texture.image.height = result.height;
-		texture.image.data = result.data;
+		texture.image.data = rgbaBuffer;
 		texture.minFilter = LinearMipMapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.type = result.data.BYTES_PER_ELEMENT === 1 ? UnsignedByteType : HalfFloatType;
-		texture.encoding = sRGBEncoding;
-		texture.format = LuminanceFormat;
+		texture.encoding = result.data.BYTES_PER_ELEMENT === 1 ? sRGBEncoding : LinearEncoding;
+		texture.format = RGBAFormat;
 		texture.flipY = true;
 		texture.generateMipmaps = true;
 		texture.needsUpdate = true;

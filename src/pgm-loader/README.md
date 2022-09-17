@@ -100,7 +100,7 @@ constructor( manager : LoadingManager = DefaultLoadingManager ) : void
 ### .load
 
 ```js
-load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
+load( url : String, texture : DataTexture = new DataTexture() ) : Promise<DataTexture>
 ```
 
 Loads and parses the PGM file and returns a DataTexture. If a DataTexture is passed into
