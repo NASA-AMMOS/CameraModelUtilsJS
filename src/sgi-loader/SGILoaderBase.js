@@ -167,18 +167,17 @@ export class SGILoaderBase {
 				console.warn( 'SGILoader: RLE 2 bytes per channel files have not been tested.' );
 
 			}
+
 			const data8Buffer = new Uint8Array( data.buffer, data.byteOffset, data.byteLength );
 			const count = height * channels;
+			const startTableLength = count * 4;
 			for ( let c = 0; c < channels; c ++ ) {
 
 				for ( let r = 0; r < height; r ++ ) {
 
-					const rowIndex = c * height + r;
-					const start = dataView.getInt32( HEADER_LENGTH + rowIndex * 4, false );
-					const length = dataView.getInt32(
-						HEADER_LENGTH + count * 4 + rowIndex * 4,
-						false,
-					);
+					const tableRowIndex = c * height + r;
+					const start = dataView.getInt32( HEADER_LENGTH + tableRowIndex * 4, false );
+					const length = dataView.getInt32( HEADER_LENGTH + startTableLength + tableRowIndex * 4, false );
 					const end = start + length;
 
 					let targetOffset = r * width * channels * bytesPerChannel + c;

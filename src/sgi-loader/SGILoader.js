@@ -9,6 +9,8 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	DefaultLoadingManager,
+	sRGBEncoding,
+	LinearEncoding,
 } from 'three';
 
 /**
@@ -42,21 +44,22 @@ export class SGILoader extends SGILoaderBase {
 
 		const manager = this.manager;
 		manager.itemStart( url );
-		super.load( url ).then( result => {
+		return super.load( url ).then( result => {
 
 			texture.copy( result );
 			texture.needsUpdate = true;
+			return texture
 
 		} ).catch( err => {
 
 			manager.itemError( url, err );
+			throw err;
 
 		} ).finally( () => {
 
 			manager.itemEnd( url );
 
 		} );
-		return texture;
 
 	}
 
@@ -82,6 +85,7 @@ export class SGILoader extends SGILoaderBase {
 		texture.minFilter = LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.type = result.data.BYTES_PER_ELEMENT === 1 ? UnsignedByteType : UnsignedShortType;
+		texture.encoding = result.data.BYTES_PER_ELEMENT === 1 ? sRGBEncoding : LinearEncoding;
 
 		switch ( result.channels ) {
 
@@ -93,17 +97,19 @@ export class SGILoader extends SGILoaderBase {
 				break;
 			case 3: {
 
-				// three.js no long supports RGBFormat so conver the data to
+				// three.js does not support RGBFormat so convert the data to
 				// 4 channel data.
 				const { width, height, data } = result;
 				const newData = new data.constructor( width * height * 4 );
 				const maxValue = Math.pow( 2, newData.BYTES_PER_ELEMENT * 8 );
-				for ( let i = 0, l = data.length; i < l; i += 3 ) {
+				for ( let i = 0, l = width * height; i < l; i ++ ) {
 
-					newData[ i + 0 ] = data[ i + 0 ];
-					newData[ i + 1 ] = data[ i + 1 ];
-					newData[ i + 2 ] = data[ i + 2 ];
-					newData[ i + 3 ] = maxValue;
+					const i3 = 3 * i;
+					const i4 = 4 * i;
+					newData[ i4 + 0 ] = data[ i3 + 0 ];
+					newData[ i4 + 1 ] = data[ i3 + 1 ];
+					newData[ i4 + 2 ] = data[ i3 + 2 ];
+					newData[ i4 + 3 ] = maxValue;
 
 				}
 
