@@ -20,7 +20,7 @@ async function init() {
 
 	// init camera
 	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.set( 0, 0, - 1.5 );
+	camera.position.set( 0, 0, 1.5 );
 
 	scene = new THREE.Scene();
 
