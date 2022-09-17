@@ -59,20 +59,20 @@ export class SGILoaderBase {
 	constructor() {
 
 		/**
-         * @member {Object}
-         * @description Fetch options for loading the file.
-         * @default { credentials: 'same-origin' }
-         */
+		 * @member {Object}
+		 * @description Fetch options for loading the file.
+		 * @default { credentials: 'same-origin' }
+		 */
 		this.fetchOptions = { credentials: 'same-origin' };
 
 	}
 
 	/**
-     * Loads and parses the SGI file. The promise resolves with the returned
-     * data from the {@link #SGILoaderBase#parse parse} function.
-     * @param {String} url
-     * @returns {Promise<SGIResult>}
-     */
+	 * Loads and parses the SGI file. The promise resolves with the returned
+	 * data from the {@link #SGILoaderBase#parse parse} function.
+	 * @param {String} url
+	 * @returns {Promise<SGIResult>}
+	 */
 	load( url ) {
 
 		return fetch( url, this.fetchOptions )
@@ -91,11 +91,11 @@ export class SGILoaderBase {
 	}
 
 	/**
-     * Parses the contents of the given SGI contents and returns an object describing
-     * the telemetry.
-     * @param {ArrayBuffer|Uint8Array} buffer
-     * @returns {SGIResult}
-     */
+	 * Parses the contents of the given SGI contents and returns an object describing
+	 * the telemetry.
+	 * @param {ArrayBuffer|Uint8Array} buffer
+	 * @returns {SGIResult}
+	 */
 	parse( buffer ) {
 
 		const HEADER_LENGTH = 512;

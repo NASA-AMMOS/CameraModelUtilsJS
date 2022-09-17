@@ -42,20 +42,20 @@ export class PGMLoaderBase {
 	constructor() {
 
 		/**
-         * @member {Object}
-         * @description Fetch options for loading the file.
-         * @default { credentials: 'same-origin' }
-         */
+		 * @member {Object}
+		 * @description Fetch options for loading the file.
+		 * @default { credentials: 'same-origin' }
+		 */
 		this.fetchOptions = { credentials: 'same-origin' };
 
 	}
 
 	/**
-     * Loads and parses the PGM file. The promise resolves with the returned
-     * data from the {@link #PGMLoader#parse parse} function.
-     * @param {String} url
-     * @returns {Promise<PGMResult>}
-     */
+	 * Loads and parses the PGM file. The promise resolves with the returned
+	 * data from the {@link #PGMLoader#parse parse} function.
+	 * @param {String} url
+	 * @returns {Promise<PGMResult>}
+	 */
 	load( url ) {
 
 		return fetch( url, this.fetchOptions )
@@ -74,11 +74,11 @@ export class PGMLoaderBase {
 	}
 
 	/**
-     * Parses the contents of the given PGM and returns an object describing
-     * the telemetry.
-     * @param {ArrayBuffer} buffer
-     * @returns {PGMResult}
-     */
+	 * Parses the contents of the given PGM and returns an object describing
+	 * the telemetry.
+	 * @param {ArrayBuffer} buffer
+	 * @returns {PGMResult}
+	 */
 	parse( buffer ) {
 
 		const dataView = new DataView( buffer );

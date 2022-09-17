@@ -17,27 +17,27 @@ import {
 export class SGILoader extends SGILoaderBase {
 
 	/**
-     * @param {LoadingManager} manager
-     */
+	 * @param {LoadingManager} manager
+	 */
 	constructor( manager = DefaultLoadingManager ) {
 
 		super();
 
 		/**
-         * @member {LoadingManager}
-         * @default DefaultLoadingManager
-         */
+		 * @member {LoadingManager}
+		 * @default DefaultLoadingManager
+		 */
 		this.manager = manager;
 
 	}
 
 	/**
-     * Loads and parses the SGI file and returns a DataTexture. If a DataTexture is passed into
-    * the function the data is applied to it.
-     * @param {String} url
-     * @param {DataTexture} texture
-     * @returns {DataTexture}
-     */
+	 * Loads and parses the SGI file and returns a DataTexture. If a DataTexture is passed into
+	 * the function the data is applied to it.
+	 * @param {String} url
+	 * @param {DataTexture} texture
+	 * @returns {DataTexture}
+	 */
 	load( url, texture = new DataTexture() ) {
 
 		const manager = this.manager;
@@ -61,11 +61,11 @@ export class SGILoader extends SGILoaderBase {
 	}
 
 	/**
-     * Parses the contents of the given SGI contents and returns a texture.
-     * @param {ArrayBuffer|Uint8Array} buffer
-     * @param {DataTexture} texture
-     * @returns {DataTexture}
-     */
+	 * Parses the contents of the given SGI contents and returns a texture.
+	 * @param {ArrayBuffer|Uint8Array} buffer
+	 * @param {DataTexture} texture
+	 * @returns {DataTexture}
+	 */
 	parse( buffer, texture = new DataTexture() ) {
 
 		let result = buffer;

@@ -16,27 +16,27 @@ import {
 export class PGMLoader extends PGMLoaderBase {
 
 	/**
-     * @param {LoadingManager} manager
-     */
+	 * @param {LoadingManager} manager
+	 */
 	constructor( manager = DefaultLoadingManager ) {
 
 		super();
 
 		/**
-         * @member {LoadingManager}
-         * @default DefaultLoadingManager
-         */
+		 * @member {LoadingManager}
+		 * @default DefaultLoadingManager
+		 */
 		this.manager = manager;
 
 	}
 
 	/**
-     * Loads and parses the PGM file and returns a DataTexture. If a DataTexture is passed into
-     * the function the data is applied to it.
-     * @param {String} url
-     * @param {DataTexture} texture
-     * @returns {DataTexture}
-     */
+	 * Loads and parses the PGM file and returns a DataTexture. If a DataTexture is passed into
+	 * the function the data is applied to it.
+	 * @param {String} url
+	 * @param {DataTexture} texture
+	 * @returns {DataTexture}
+	 */
 	load( url, texture = new DataTexture() ) {
 
 		const manager = this.manager;
@@ -60,12 +60,12 @@ export class PGMLoader extends PGMLoaderBase {
 	}
 
 	/**
-     * Parses the contents of the given PGM file and returns a texture with the
-     * contents.
-     * @param {Uint8Array | ArrayBuffer} buffer
-     * @param {DataTexture} texture
-     * @returns {DataTexture}
-     */
+	 * Parses the contents of the given PGM file and returns a texture with the
+	 * contents.
+	 * @param {Uint8Array | ArrayBuffer} buffer
+	 * @param {DataTexture} texture
+	 * @returns {DataTexture}
+	 */
 	parse( buffer, texture = new DataTexture() ) {
 
 		let result = buffer;
