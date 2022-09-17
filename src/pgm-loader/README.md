@@ -1,6 +1,6 @@
 # PGM Loader
 
-A class in the same form as the three.js loaders for loading and parsing [PGM images](http://netpbm.sourceforge.net/doc/pgm.html).
+A class in the same form as the three.js loaders for loading and parsing PGM images ([ref 1](http://netpbm.sourceforge.net/doc/pgm.html), [ref 2](https://people.sc.fsu.edu/~jburkardt/data/pgma/pgma.html)).
 
 # Use
 
