@@ -48,7 +48,7 @@ export class SGILoader extends SGILoaderBase {
 
 			texture.copy( result );
 			texture.needsUpdate = true;
-			return texture
+			return texture;
 
 		} ).catch( err => {
 
