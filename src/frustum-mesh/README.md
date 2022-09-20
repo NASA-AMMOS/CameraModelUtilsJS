@@ -25,8 +25,6 @@ scene.add( distortedFrustum );
 
 ## CahvoreParameters
 
-Set of options for passing into the `Frustum` object to generate the distorted frustum.
-
 ### .width
 
 ```js
@@ -106,6 +104,18 @@ linearity : Number = 1
 ```
 
 Linearity parameter. Only required for CAHVORE models.
+
+## CameraInfo
+
+Set of options for passing into the `Frustum` object to generate the distorted frustum.
+
+### .model
+
+```js
+model : CahvoreParameters
+```
+
+Object representing the CAHVORE parameters of the camera to represent.
 
 ### .near
 

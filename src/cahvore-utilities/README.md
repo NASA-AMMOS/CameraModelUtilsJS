@@ -117,7 +117,7 @@ Functions for using the camera model known locally as CAHVOR. This model is an e
 ### getRay
 
 ```js
-getRay( model : Object, sample : Vector2, outRay : Ray ) : void
+getRay( model : CahvoreParamaters, sample : Vector2, outRay : Ray ) : void
 ```
 
 Returns the outgoing ray from the camera model given an image sample coordinate. Internally calls the appropriate camera model to ray function.
@@ -127,7 +127,7 @@ The "sample" vector is in pixel values that must fall within the model.width and
 ### getLinearFrustumInfo
 
 ```js
-getLinearFrustumInfo( model : Object ) : LinearFrustumInfo
+getLinearFrustumInfo( model : CahvoreParamaters ) : LinearFrustumInfo
 ```
 
 Function takes a camera model and returns an object describing the resulting local camera frame and minimum and maximum frustums.
@@ -144,6 +144,14 @@ frameBoundsToProjectionMatrix(
 ```
 
 Function that takes a frame bounds description of a bounding box 1m out in the camera frame and sets the "target" matrix to an off axis projection matrix with the apex at the current origin.
+
+## CahvoreParameters
+
+See `CahvoreParamaters` description [here](../frustum-mesh/README.md#CahvoreParamaters).
+
+## CameraInfo
+
+See `CameraInfo` description [here](../frustum-mesh/README.md#CameraInfo).
 
 ## FrameBounds
 
@@ -229,7 +237,7 @@ If true then a checkerboard modeling the distortion is rendered.
 ### .setFromCameraModel
 
 ```js
-setFromCameraModel( cahvoreModel : Object ) : void
+setFromCameraModel( cameraInfo : CameraInfo ) : void
 ```
 
 Sets the necessary uniforms to properly distort the camera preview.
