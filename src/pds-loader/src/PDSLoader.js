@@ -1,4 +1,4 @@
-import { VicarLoaderBase } from '@gov.nasa.jpl.honeycomb/vicar-loader';
+import { VicarLoaderBase } from '../../vicar-loader/src/base/VicarLoaderBase.js';
 import { readHeaderString, parseLabels, getFirstLabelInstance } from './utils.js';
 
 /**

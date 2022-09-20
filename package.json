@@ -11,19 +11,22 @@
   },
   "homepage": "https://github.com/NASA-AMMOS/CameraModelUtilsJS#readme",
   "dependencies": {
-    "three": "^0.136.0",
-		"@babel/core": "^7.13.8",
-    "@babel/preset-env": "^7.13.8",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
     "@types/three": ">=0.128.0",
+    "babel-jest": "^27.2.4",
     "eslint": "^6.8.0",
-    "eslint-config-mdcs": "^4.2.3"
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "jest": "^27.2.4",
+    "three": "^0.136.0"
   },
   "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
   "license": "Apache-2.0",
   "main": "src/index.js",
   "scripts": {
-		"lint": "eslint \"src/**/*.js\"",
-    "test": "echo \"Warn: no test specified\""
+    "lint": "eslint \"src/**/*.js\"",
+    "test": "jest"
   },
   "sideEffects": false,
   "type": "module",

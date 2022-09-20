@@ -3,9 +3,18 @@
 	"parserOptions": {
         "ecmaVersion": 2018
 	},
+	"env": {
+		"jest/globals": true
+	},
 
 	"extends": ["./node_modules/eslint-config-mdcs/index.js"],
+	"plugins": ["jest"],
 	"rules": {
+		"jest/no-disabled-tests": "warn",
+		"jest/no-focused-tests": "error",
+		"jest/no-identical-title": "error",
+		"jest/prefer-to-have-length": "warn",
+		"jest/valid-expect": "error",
 		"no-unused-vars": [ 1, { "args": "none" } ],
 		"no-throw-literal": [
 			"error"
