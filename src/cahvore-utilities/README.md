@@ -149,10 +149,6 @@ Function that takes a frame bounds description of a bounding box 1m out in the c
 
 See `CahvoreParamaters` description [here](../frustum-mesh/README.md#CahvoreParamaters).
 
-## CameraInfo
-
-See `CameraInfo` description [here](../frustum-mesh/README.md#CameraInfo).
-
 ## FrameBounds
 
 ### .left
@@ -237,7 +233,7 @@ If true then a checkerboard modeling the distortion is rendered.
 ### .setFromCameraModel
 
 ```js
-setFromCameraModel( cameraInfo : CameraInfo ) : void
+setFromCameraModel( model : CahvoreParameters ) : void
 ```
 
 Sets the necessary uniforms to properly distort the camera preview.
