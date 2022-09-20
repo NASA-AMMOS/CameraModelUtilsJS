@@ -2,7 +2,7 @@
 
 [![build](https://img.shields.io/github/workflow/status/NASA-AMMOS/CameraModelUtilsJS/Node.js%20CI?style=flat-square&label=build)](https://github.com/NASA-AMMOS/CameraModelUtilsJS/actions)
 
-Series of packages for visualizing and rendering images and frustum shapes based on CAHVORE camera models as well as loading SGI and PGM images in three.js.
+Series of packages for visualizing and rendering images and frustum shapes based on CAHVORE camera models as well as loading SGI, PGM, PDS, and Vicar images in three.js.
 
 ![](./docs/banner.png)
 
@@ -31,6 +31,14 @@ Project for loading Silicon Graphics image format files into a three.js data tex
 [PGM Loader](./src/pgm-loader/)
 
 Project for loading PGM image format files into a three.js data texture.
+
+[Vicar Loader](./src/vicar-loader/)
+
+Project for loading Vicar image format files into a three.js data texture.
+
+[PDS Loader](./src/pds-loader/)
+
+Project for loading PDS image format files into a three.js data texture.
 
 # LICENSE
 
