@@ -234,7 +234,6 @@ async function init() {
 
 				// convert the CAHVORE arrays to vectors
 				const model = c.model;
-				model.type = c.type;
 				for ( const key in model ) {
 
 					if ( Array.isArray( model[ key ] ) ) {
