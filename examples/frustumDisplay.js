@@ -165,6 +165,19 @@ async function init() {
 			cameraModels = {};
 			result.forEach( c => {
 
+				// convert the CAHVORE arrays to vectors
+				const model = c.model;
+				model.type = c.type;
+				for ( const key in model ) {
+
+					if ( Array.isArray( model[ key ] ) ) {
+
+						model[ key ] = new THREE.Vector3( ...model[ key ] );
+
+					}
+
+				}
+
 				cameraModels[ c.name ] = c;
 
 			} );
@@ -209,22 +222,16 @@ function buildGUI() {
 
 function updateFrustums() {
 
-	// TODO: simplify
-	const model = cameraModels[ params.camera ];
-	const m = { ...model, ...model.model };
-	for ( const key in m ) {
-
-		if ( Array.isArray( m[ key ] ) ) m[ key ] = new THREE.Vector3( ...m[ key ] );
-
-	}
+	const camera = cameraModels[ params.camera ];
+	const model = camera.model;
 
 	// init the cahvore frustum volume
-	m.near = params.near;
-	m.far = params.far;
-	m.widthSegments = params.widthSegments;
-	m.heightSegments = params.heightSegments;
-	m.planarProjectionFactor = params.planarProjectionFactor;
-	distortedFrustum.setFromCahvoreParameters( m );
+	camera.near = params.near;
+	camera.far = params.far;
+	camera.widthSegments = params.widthSegments;
+	camera.heightSegments = params.heightSegments;
+	camera.planarProjectionFactor = params.planarProjectionFactor;
+	distortedFrustum.setFromCahvoreParameters( camera );
 
 	distortedLines.geometry.dispose();
 	distortedLines.geometry = new THREE.EdgesGeometry( distortedFrustum.geometry, 35 );
@@ -232,7 +239,7 @@ function updateFrustums() {
 	// generate the linear frustums
 	const minMatrix = new THREE.Matrix4();
 	const maxMatrix = new THREE.Matrix4();
-	const linearInfo = getLinearFrustumInfo( m );
+	const linearInfo = getLinearFrustumInfo( model );
 	frameBoundsToProjectionMatrix( linearInfo.minFrameBounds, params.near, params.far, minMatrix );
 	frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, maxMatrix );
 

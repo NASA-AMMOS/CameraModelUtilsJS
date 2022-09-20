@@ -13,11 +13,12 @@ const tempRay = new Ray();
  * options from createFrustumGeometry
  * positions the flat array of positions we are modifying
  */
-function updateFrustumPositions( options, positions ) {
+function updateFrustumPositions( camera, positions ) {
 
 	// if projectEnds is true then the near and far distances for the rays
 	// are projected onto the near and far planes
-	const projectDirection = options.A.clone().normalize();
+	const { model, near, far, planarProjectionFactor } = camera;
+	const projectDirection = model.A.clone().normalize();
 
 	for ( let i = 0, l = positions.count; i < l; i ++ ) {
 
@@ -26,22 +27,22 @@ function updateFrustumPositions( options, positions ) {
 
 		// convert them into image space
 		// This is why the range must be between [0, 1]
-		position.x = position.x * options.width;
-		position.y = position.y * options.height;
+		position.x = position.x * model.width;
+		position.y = position.y * model.height;
 
-		getRay( options, position, tempRay );
+		getRay( model, position, tempRay );
 
 		// get the point at the given distance along the ray
-		tempRay.at( position.z < 0 ? options.near : options.far, tempVec );
+		tempRay.at( position.z < 0 ? near : far, tempVec );
 
 		// get the plane-projected version of the near / far point
 		const zSign = position.z < 0;
 		tempRay.direction.normalize();
 		tempRay.direction.multiplyScalar( 1 / tempRay.direction.dot( projectDirection ) );
-		planeProjectedVec.copy( tempRay.origin ).addScaledVector( tempRay.direction, zSign ? options.near : options.far );
+		planeProjectedVec.copy( tempRay.origin ).addScaledVector( tempRay.direction, zSign ? near : far );
 
 		// interpolate to the plane vector based on planar factor
-		tempVec.lerp( planeProjectedVec, options.planarProjectionFactor );
+		tempVec.lerp( planeProjectedVec, planarProjectionFactor );
 
 		// set the position
 		positions.setXYZ( i, tempVec.x, tempVec.y, tempVec.z );
@@ -51,15 +52,16 @@ function updateFrustumPositions( options, positions ) {
 }
 
 /*
- * Create the geometry for the frustum. Takes CahvoreParameters.
+ * Create the geometry for the frustum. Takes CameraInfo.
  */
-function createCahvoreFrustumGeometry( options ) {
+function createCahvoreFrustumGeometry( camera ) {
 
-	const geom = new BoxGeometry( 1, 1, 1, options.widthSegments, options.heightSegments, 1 );
+	const { widthSegments, heightSegments } = camera;
+	const geom = new BoxGeometry( 1, 1, 1, widthSegments, heightSegments, 1 );
 	geom.translate( 0.5, 0.5, 0 );
 
 	const positions = geom.getAttribute( 'position' );
-	updateFrustumPositions( options, positions );
+	updateFrustumPositions( camera, positions );
 
 	geom.setAttribute( 'position', positions );
 	geom.computeVertexNormals();
@@ -68,7 +70,7 @@ function createCahvoreFrustumGeometry( options ) {
 }
 
 /**
- * @typedef {Object} CahvoreParameters
+ * @typedef {Object} CameraParameters
  * @param {('CAHV'|'CAHVOR'|'CAHVORE')} type CAHV, CAHVOR, or CAHVORE
  * @param {Number} width max number of pixels in width
  * @param {Number} height max number of pixels in height
@@ -80,6 +82,11 @@ function createCahvoreFrustumGeometry( options ) {
  * @param {Vector3|null} [R=null] radial-distortion, only required for CAHVORE
  * @param {Vector3|null} [E=null] entrance-pupil, only required for CAHVORE
  * @param {Number} [linearity=1] linearity parameter, only required for CAHVORE
+ */
+
+/**
+ * @typedef {Object} CameraInfo
+ * @param {CameraParameters} model
  * @param {Number} [near=0.085] the distance between the camera model and the near plane
  * @param {Number} [far=10.0] the distance between the camera model and the far plane
  * @param {Number} [widthSegments=16] the number of segments to create along the x axis (all sides)
@@ -106,11 +113,21 @@ export class FrustumMesh extends Mesh {
 
 	/**
      * Update the parameters of the CAHVORE frustum geometry.
-     * @param {CahvoreParameters} parameters
+     * @param {CameraInfo} camera
      */
-	setFromCahvoreParameters( parameters ) {
+	 setFromCahvoreParameters( camera ) {
 
-		const defaultedParams = {
+		const defaultedCamera = {
+			model: {},
+			near: 0.085,
+			far: 10.0,
+			widthSegments: 16,
+			heightSegments: 16,
+			planarProjectionFactor: 0,
+			...camera,
+		};
+
+		defaultedCamera.model = {
 			type: 'CAHV',
 			C: null,
 			A: null,
@@ -123,16 +140,11 @@ export class FrustumMesh extends Mesh {
 			width: 1,
 			height: 1,
 
-			near: 0.085,
-			far: 10.0,
-			widthSegments: 16,
-			heightSegments: 16,
-			planarProjectionFactor: 0,
-			...parameters,
+			...defaultedCamera.model,
 		};
 
 		this.geometry.dispose();
-		this.geometry = createCahvoreFrustumGeometry( defaultedParams );
+		this.geometry = createCahvoreFrustumGeometry( defaultedCamera );
 
 	}
 
