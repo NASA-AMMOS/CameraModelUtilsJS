@@ -1,4 +1,4 @@
-import { Matrix4, Vector2, Vector3, Vector4 } from 'three';
+import { Matrix4, Vector3 } from 'three';
 import { mathFunctions } from './mathFunctions.js';
 import { cahvoreFunction } from './shaderFunctions.js';
 
