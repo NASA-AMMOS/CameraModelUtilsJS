@@ -118,11 +118,13 @@ export class SGILoader extends SGILoaderBase {
 				break;
 
 			}
+
 			case 4:
 				texture.format = RGBAFormat;
 				break;
 
 		}
+
 		texture.needsUpdate = true;
 
 		return texture;

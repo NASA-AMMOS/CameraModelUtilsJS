@@ -76,6 +76,7 @@ function consumeArray( string, i ) {
 		}
 
 	}
+
 	return { token, index: i };
 
 }
@@ -95,6 +96,7 @@ function parseLabels( string ) {
 				tokens.push( lastToken );
 
 			}
+
 			lastToken = '';
 
 		} else if ( c === '\'' ) {
@@ -150,9 +152,11 @@ function readString( buffer, from, to ) {
 			break;
 
 		}
+
 		str += value;
 
 	}
+
 	return str;
 
 }
@@ -176,6 +180,7 @@ function readUntil( buffer, from, cb ) {
 		}
 
 	}
+
 	return str;
 
 }

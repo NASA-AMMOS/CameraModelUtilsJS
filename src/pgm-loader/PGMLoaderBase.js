@@ -66,6 +66,7 @@ export class PGMLoaderBase {
 					throw new Error( `PGMLoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}` );
 
 				}
+
 				return res.arrayBuffer();
 
 			} )

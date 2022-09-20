@@ -65,6 +65,7 @@ export class VicarLoaderBase {
 					throw new Error( `VicarLoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}` );
 
 				}
+
 				return res.arrayBuffer();
 
 			} )
@@ -91,6 +92,7 @@ export class VicarLoaderBase {
 			byteBuffer = new Uint8Array( buffer );
 
 		}
+
 		const lblsizeStr = readUntil( byteBuffer, 0, c => /\s/.test( c ) );
 		const labelSize = parseInt( lblsizeStr.split( '=' )[ 1 ] );
 
@@ -214,6 +216,7 @@ export class VicarLoaderBase {
 					throw new Error( 'VicarLoader: VAX REALFMT not supported.' );
 
 				}
+
 				break;
 			case 'DOUB':
 				cons = Float64Array;
@@ -224,6 +227,7 @@ export class VicarLoaderBase {
 					throw new Error( 'VicarLoader: VAX REALFMT not supported.' );
 
 				}
+
 				break;
 			case 'COMPLEX':
 			case 'COMP':
@@ -236,6 +240,7 @@ export class VicarLoaderBase {
 					throw new Error( 'VicarLoader: VAX REALFMT not supported.' );
 
 				}
+
 				break;
 
 		}

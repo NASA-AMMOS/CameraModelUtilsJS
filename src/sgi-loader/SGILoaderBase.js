@@ -14,6 +14,7 @@ function readUpTo( dataView, offset = 0, maxLength = Infinity ) {
 		currOffset ++;
 
 	}
+
 	return str;
 
 }
@@ -83,6 +84,7 @@ export class SGILoaderBase {
 					throw new Error( `SGILoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}` );
 
 				}
+
 				return res.arrayBuffer();
 
 			} )

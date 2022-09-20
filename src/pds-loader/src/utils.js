@@ -19,6 +19,7 @@ function parseValue( val, name ) {
 			);
 
 		}
+
 		return val;
 
 	} else {
@@ -103,6 +104,7 @@ function processLabelGroup( tokens, target, offset = 0, endGroupName = null ) {
 					console.warn( `PDSLoader: Found group with duplicate name "${val}".` );
 
 				}
+
 				target.push( { isLabelGroup: true, name: val, value: groupLabels } );
 				break;
 
@@ -177,6 +179,7 @@ function parseLabels( string ) {
 				}
 
 			}
+
 			tokens.push( name.trim(), value.trim() );
 
 		} else {

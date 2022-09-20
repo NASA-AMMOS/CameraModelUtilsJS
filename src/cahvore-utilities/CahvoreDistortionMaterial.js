@@ -86,6 +86,7 @@ export class CahvoreDistortionMaterial extends ShaderMaterial {
 					this.needsUpdate = true;
 
 				}
+
 				this.uniforms[ 'map' ].value = v;
 
 			},
@@ -123,6 +124,7 @@ export class CahvoreDistortionMaterial extends ShaderMaterial {
 				this.needsUpdate = true;
 
 			}
+
 			defines.MODEL_TYPE = modelType;
 
 		}

@@ -53,6 +53,7 @@ class PDSLoader {
 					throw new Error( `PDSLoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}` );
 
 				}
+
 				return res.arrayBuffer();
 
 			} )

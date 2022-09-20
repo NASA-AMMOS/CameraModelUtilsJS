@@ -164,6 +164,7 @@ function cmod_cahvore_2d_to_3d_general( pos2, linearity, c, a, h, v, o, r, e, po
 		ri.addVectors( u3, v3 );
 
 	}
+
 	pos3.copy( cp );
 	uvec3.copy( ri );
 

@@ -9,6 +9,7 @@ function stringToBuffer( str ) {
 		byteBuffer[ i ] = str.charCodeAt( i );
 
 	}
+
 	return byteBuffer.buffer;
 
 }

@@ -9,6 +9,7 @@ function createFile( labels, labelSize, contentSize ) {
 		byteBuffer[ i ] = trimmedLabels.charCodeAt( i );
 
 	}
+
 	return byteBuffer.buffer;
 
 }
