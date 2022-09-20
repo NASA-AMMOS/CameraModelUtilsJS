@@ -1,5 +1,5 @@
 import { cmod_cahv_2d_to_3d, cmod_cahvore_2d_to_3d_general, cmod_cahvor_2d_to_3d } from './cahvore.js';
-import { Vector3, Ray, Plane, Matrix4, Vector2 } from 'three';
+import { Vector3, Ray, Plane, Matrix4 } from 'three';
 
 // CAHVORE Camera Frame
 // X-----.

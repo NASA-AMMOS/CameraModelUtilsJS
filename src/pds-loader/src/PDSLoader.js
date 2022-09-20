@@ -25,116 +25,156 @@ import { readHeaderString, parseLabels, getFirstLabelInstance } from './utils.js
  * Class for loading and parsing PDS files.
  */
 class PDSLoader {
-    constructor() {
-        /**
-         * @member {Object}
-         * @description Fetch options for loading the file.
-         * @default { credentials: 'same-origin' }
-         */
-        this.fetchOptions = { credentials: 'same-origin' };
-    }
 
-    /**
-     * Loads and parses the PDS file. The promise resolves with the returned
-     * data from the {@link #PDSLoader#parse parse} function.
-     * @param {String} url
-     * @returns {Promise<PDSResult>}
-     */
-    load(url) {
-        return fetch(url, this.fetchOptions)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`PDSLoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}`);
-                }
-                return res.arrayBuffer();
-            })
-            .then(buffer => this.parse(buffer));
-    }
+	constructor() {
 
-    /**
-     * Parses the contents of the given PDS file and returns an object describing
-     * the telemetry.
-     * @param {Uint8Array | ArrayBuffer} buffer
-     * @returns {PDSResult}
-     */
-    parse(buffer) {
-        let byteBuffer;
-        if (buffer instanceof Uint8Array) {
-            byteBuffer = buffer;
-        } else {
-            byteBuffer = new Uint8Array(buffer);
-        }
+		/**
+		 * @member {Object}
+		 * @description Fetch options for loading the file.
+		 * @default { credentials: 'same-origin' }
+		 */
+		this.fetchOptions = { credentials: 'same-origin' };
 
-        const headerString = readHeaderString(byteBuffer);
-        const labels = parseLabels(headerString);
-        const labelRecords = getFirstLabelInstance(labels, 'LABEL_RECORDS', 1);
-        const recordBytes = getFirstLabelInstance(labels, 'RECORD_BYTES');
-        const recordType = getFirstLabelInstance(labels, 'RECORD_TYPE');
-        const labelSize = labelRecords * recordBytes;
+	}
 
-        if (recordType !== 'FIXED_LENGTH') {
-            console.warn('PDSLoader: Non FIXED_LENGTH record types not supported');
-            return Promise.resolve(null);
-        }
+	/**
+	 * Loads and parses the PDS file. The promise resolves with the returned
+	 * data from the {@link #PDSLoader#parse parse} function.
+	 * @param {String} url
+	 * @returns {Promise<PDSResult>}
+	 */
+	load( url ) {
 
-        const products = [];
-        for (const i in labels) {
-            const { name, value } = labels[i];
-            if (/^\^/.test(name)) {
-                if (Array.isArray(value)) {
-                    const [path, index] = value;
-                } else if (typeof value === 'number' || /<BYTES>/.test(value)) {
-                    let pointer;
-                    if (/<BYTES>/.test(value)) {
-                        pointer = value.replace(/<BYTES>/, '');
-                    } else {
-                        pointer = value * recordBytes;
-                    }
-                } else {
-                    const path = value;
-                }
+		return fetch( url, this.fetchOptions )
+			.then( res => {
 
-                products.push({
-                    name: name.replace(/^\^/, ''),
-                    value: null,
-                });
-            }
-        }
+				if ( ! res.ok ) {
 
-        const result = {};
-        result.labels = labels;
-        result.product = null;
-        result.products = null;
+					throw new Error( `PDSLoader: Failed to load file "${url}" with status ${res.status} : ${res.statusText}` );
 
-        const noProducts = products.length === 0;
-        const justVicarProduct =
-            products.length === 2 &&
-            getFirstLabelInstance(products, 'IMAGE') !== undefined &&
-            getFirstLabelInstance(products, 'IMAGE_HEADER') !== undefined &&
-            typeof getFirstLabelInstance(labels, '^IMAGE') === 'number' &&
-            typeof getFirstLabelInstance(labels, '^IMAGE_HEADER') === 'number' &&
-            getFirstLabelInstance(labels, 'IMAGE_HEADER.HEADER_TYPE') === 'VICAR2';
+				}
+				return res.arrayBuffer();
 
-        if (noProducts || justVicarProduct) {
-            if (getFirstLabelInstance(labels, 'IMAGE_HEADER.HEADER_TYPE') === 'VICAR2') {
-                const loader = new VicarLoaderBase();
-                const vicarBuffer = new Uint8Array(
-                    byteBuffer.buffer,
-                    byteBuffer.byteOffset + labelSize,
-                );
-                result.product = loader.parse(vicarBuffer);
-            } else {
-                console.warn('PDSLoader: Could not parse PDS product.');
-            }
-        } else {
-            result.products = products;
-            console.warn(
-                'PDSLoader: File contains product pointers which are not yet supported beyond IMAGE and IMAGE_HEADER for Vicar files.',
-            );
-        }
+			} )
+			.then( buffer => this.parse( buffer ) );
 
-        return Promise.resolve(result);
-    }
+	}
+
+	/**
+	 * Parses the contents of the given PDS file and returns an object describing
+	 * the telemetry.
+	 * @param {Uint8Array | ArrayBuffer} buffer
+	 * @returns {PDSResult}
+	 */
+	parse( buffer ) {
+
+		let byteBuffer;
+		if ( buffer instanceof Uint8Array ) {
+
+			byteBuffer = buffer;
+
+		} else {
+
+			byteBuffer = new Uint8Array( buffer );
+
+		}
+
+		const headerString = readHeaderString( byteBuffer );
+		const labels = parseLabels( headerString );
+		const labelRecords = getFirstLabelInstance( labels, 'LABEL_RECORDS', 1 );
+		const recordBytes = getFirstLabelInstance( labels, 'RECORD_BYTES' );
+		const recordType = getFirstLabelInstance( labels, 'RECORD_TYPE' );
+		const labelSize = labelRecords * recordBytes;
+
+		if ( recordType !== 'FIXED_LENGTH' ) {
+
+			console.warn( 'PDSLoader: Non FIXED_LENGTH record types not supported' );
+			return Promise.resolve( null );
+
+		}
+
+		const products = [];
+		for ( const i in labels ) {
+
+			const { name, value } = labels[ i ];
+			if ( /^\^/.test( name ) ) {
+
+				if ( Array.isArray( value ) ) {
+
+					const [ path, index ] = value;
+
+				} else if ( typeof value === 'number' || /<BYTES>/.test( value ) ) {
+
+					let pointer;
+					if ( /<BYTES>/.test( value ) ) {
+
+						pointer = value.replace( /<BYTES>/, '' );
+
+					} else {
+
+						pointer = value * recordBytes;
+
+					}
+
+				} else {
+
+					const path = value;
+
+				}
+
+				products.push( {
+					name: name.replace( /^\^/, '' ),
+					value: null,
+				} );
+
+			}
+
+		}
+
+		const result = {};
+		result.labels = labels;
+		result.product = null;
+		result.products = null;
+
+		const noProducts = products.length === 0;
+		const justVicarProduct =
+			products.length === 2 &&
+			getFirstLabelInstance( products, 'IMAGE' ) !== undefined &&
+			getFirstLabelInstance( products, 'IMAGE_HEADER' ) !== undefined &&
+			typeof getFirstLabelInstance( labels, '^IMAGE' ) === 'number' &&
+			typeof getFirstLabelInstance( labels, '^IMAGE_HEADER' ) === 'number' &&
+			getFirstLabelInstance( labels, 'IMAGE_HEADER.HEADER_TYPE' ) === 'VICAR2';
+
+		if ( noProducts || justVicarProduct ) {
+
+			if ( getFirstLabelInstance( labels, 'IMAGE_HEADER.HEADER_TYPE' ) === 'VICAR2' ) {
+
+				const loader = new VicarLoaderBase();
+				const vicarBuffer = new Uint8Array(
+					byteBuffer.buffer,
+					byteBuffer.byteOffset + labelSize,
+				);
+				result.product = loader.parse( vicarBuffer );
+
+			} else {
+
+				console.warn( 'PDSLoader: Could not parse PDS product.' );
+
+			}
+
+		} else {
+
+			result.products = products;
+			console.warn(
+				'PDSLoader: File contains product pointers which are not yet supported beyond IMAGE and IMAGE_HEADER for Vicar files.',
+			);
+
+		}
+
+		return Promise.resolve( result );
+
+	}
+
 }
 
 export { PDSLoader };
