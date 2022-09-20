@@ -1,4 +1,4 @@
-import { VicarLoaderBase } from '../src/base/VicarLoaderBase.js';
+import { VicarLoaderBase } from './VicarLoaderBase.js';
 
 function createFile( labels, labelSize, contentSize ) {
 

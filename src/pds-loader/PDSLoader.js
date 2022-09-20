@@ -1,4 +1,4 @@
-import { VicarLoaderBase } from '../../vicar-loader/src/base/VicarLoaderBase.js';
+import { VicarLoaderBase } from '../vicar-loader/VicarLoaderBase.js';
 import { readHeaderString, parseLabels, getFirstLabelInstance } from './utils.js';
 
 /**

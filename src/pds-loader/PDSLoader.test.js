@@ -1,5 +1,5 @@
-import { PDSLoader } from '../src/PDSLoader.js';
-import { getFirstLabelInstance } from '../src/utils.js';
+import { PDSLoader } from './PDSLoader.js';
+import { getFirstLabelInstance } from './utils.js';
 
 function stringToBuffer( str ) {
 

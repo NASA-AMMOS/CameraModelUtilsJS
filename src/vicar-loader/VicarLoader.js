@@ -1,4 +1,4 @@
-import { VicarLoaderBase } from '../base/VicarLoaderBase.js';
+import { VicarLoaderBase } from './VicarLoaderBase.js';
 import { DataTexture, RGBAFormat, DefaultLoadingManager, LinearFilter, LinearMipMapLinearFilter } from 'three';
 
 /**
