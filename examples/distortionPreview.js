@@ -232,6 +232,19 @@ async function init() {
 			cameraModels = {};
 			result.forEach( c => {
 
+				// convert the CAHVORE arrays to vectors
+				const model = c.model;
+				model.type = c.type;
+				for ( const key in model ) {
+
+					if ( Array.isArray( model[ key ] ) ) {
+
+						model[ key ] = new THREE.Vector3( ...model[ key ] );
+
+					}
+
+				}
+
 				cameraModels[ c.name ] = c;
 
 			} );
@@ -278,17 +291,10 @@ function buildGUI() {
 
 function updateRenderTarget() {
 
-	// TODO: simplify
-	const model = cameraModels[ params.camera ];
-	const m = { ...model, ...model.model };
-	for ( const key in m ) {
-
-		if ( Array.isArray( m[ key ] ) ) m[ key ] = new THREE.Vector3( ...m[ key ] );
-
-	}
+	const camera = cameraModels[ params.camera ];
 
 	// get the width and height differences
-	const { minFrameBounds, maxFrameBounds } = getLinearFrustumInfo( m );
+	const { minFrameBounds, maxFrameBounds } = getLinearFrustumInfo( camera.model );
 	const minHeight = minFrameBounds.top - minFrameBounds.bottom;
 	const maxHeight = maxFrameBounds.top - maxFrameBounds.bottom;
 	const minWidth = minFrameBounds.right - minFrameBounds.left;
@@ -315,18 +321,11 @@ function updateRenderTarget() {
 
 function updateFrustums() {
 
-	// TODO: simplify
-	const model = cameraModels[ params.camera ];
-	const m = { ...model, ...model.model };
-	for ( const key in m ) {
-
-		if ( Array.isArray( m[ key ] ) ) m[ key ] = new THREE.Vector3( ...m[ key ] );
-
-	}
+	const camera = cameraModels[ params.camera ];
 
 	// generate the frustums
 	const matrix = new THREE.Matrix4();
-	const linearInfo = getLinearFrustumInfo( m );
+	const linearInfo = getLinearFrustumInfo( camera.model );
 	if ( params.rendering === 'minimum' ) {
 
 		// set the frustum shape based on the minimum linear frustum
@@ -342,10 +341,10 @@ function updateFrustums() {
 	} else {
 
 		// set the frustum shape based on the CAHVORE parameters
-		m.near = params.near;
-		m.far = params.far;
-		m.planarProjectionFactor = params.planarProjectionFactor;
-		frustumMesh.setFromCahvoreParameters( m );
+		camera.near = params.near;
+		camera.far = params.far;
+		camera.planarProjectionFactor = params.planarProjectionFactor;
+		frustumMesh.setFromCahvoreParameters( camera );
 		frameBoundsToProjectionMatrix( linearInfo.maxFrameBounds, params.near, params.far, matrix );
 
 	}
@@ -373,7 +372,7 @@ function updateFrustums() {
 	// update the distortion material
 	pass.material.checkerboard = params.rendering === 'checkerboard';
 	pass.material.passthrough = params.rendering === 'minimum' || params.rendering === 'maximum';
-	pass.material.setFromCameraModel( m );
+	pass.material.setFromCameraModel( camera.model );
 
 	updateRenderTarget();
 
