@@ -26,19 +26,19 @@ Three.js utilitiies to for generating and visualizing linear and CAHVORE frustum
 
 [SGI Loader](./src/sgi-loader/)
 
-Project for loading Silicon Graphics image format files into a three.js data texture.
+Utility for loading Silicon Graphics image format files into a three.js data texture.
 
 [PGM Loader](./src/pgm-loader/)
 
-Project for loading PGM image format files into a three.js data texture.
+Utility for loading PGM image format files into a three.js data texture.
 
 [Vicar Loader](./src/vicar-loader/)
 
-Project for loading Vicar image format files into a three.js data texture.
+Utility for loading Vicar image format files into a three.js data texture.
 
 [PDS Loader](./src/pds-loader/)
 
-Project for loading PDS image format files into a three.js data texture.
+Utility for loading PDS image format files into a three.js data texture.
 
 # LICENSE
 
