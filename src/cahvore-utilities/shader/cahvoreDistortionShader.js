@@ -114,7 +114,7 @@ export const cahvoreUnprojectShader = {
 
                 #endif
 
-                vec4 sampleCoord = vec4(rayOrigin + rayDirection, 1.0);
+                vec4 sampleCoord = vec4( rayOrigin + rayDirection, 1.0 );
                 sampleCoord = cahvoreProjectionMatrix * inverseFrame * sampleCoord;
                 sampleCoord.xyz /= sampleCoord.w;
                 sampleCoord.xy += vec2(1.0);
