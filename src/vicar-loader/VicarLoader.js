@@ -34,27 +34,26 @@ export class VicarLoader extends VicarLoaderBase {
 	 * the function the data is applied to it.
 	 * @param {String} url
 	 * @param {DataTexture} texture
-	 * @returns {DataTexture}
+	 * @returns {Promise<VicarTextureResult>}
 	 */
 	load( url, texture = new DataTexture() ) {
 
 		const manager = this.manager;
 		manager.itemStart( url );
-		super.load( url ).then( result => {
+		return super.load( url ).then( result => {
 
-			texture.copy( result );
-			texture.needsUpdate = true;
+			return this.parse( result, texture );
 
 		} ).catch( err => {
 
 			manager.itemError( url, err );
+			throw err;
 
-		} ).finally( () => {
+		} ).finally( result => {
 
 			manager.itemEnd( url );
 
 		} );
-		return texture;
 
 	}
 

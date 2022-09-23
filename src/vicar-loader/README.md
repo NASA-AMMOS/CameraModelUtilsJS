@@ -114,7 +114,7 @@ constructor( manager : LoadingManager = DefaultLoadingManager ) : void
 ### .load
 
 ```js
-load( url : String, texture : DataTexture = new DataTexture() ) : VicarTextureResult
+load( url : String, texture : DataTexture = new DataTexture() ) : Promise<VicarTextureResult>
 ```
 
 Loads and parses the Vicar file and returns a DataTexture. If a DataTexture is passed into the function the data is applied to it.
