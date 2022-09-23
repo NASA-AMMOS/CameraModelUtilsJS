@@ -5,9 +5,6 @@ Utility for loading PDS file data formats as described [here](https://pds.nasa.g
 > **Note**
 > Note that this package is built to support specific downlink products and does not support the whole PDS spec as a result. The loader can be expanded as needed.
 
-> **Warning**
-> This loader is still in progress.
-
 # Use
 
 ```js
@@ -63,6 +60,16 @@ fetchOptions : Object = { credentials: 'same-origin' }
 ```
 
 Fetch options for loading the file.
+
+### .parsers
+
+```js
+parsers : {
+	[ key : string ] : ( buffer : Uint8Buffer ) => Object
+};
+```
+
+Map from embedded file type to a parsing function. By default includes an implementation for the "VICAR2" format that just parses content.
 
 ### .load
 

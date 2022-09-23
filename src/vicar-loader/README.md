@@ -15,40 +15,6 @@ loader.load( './path/to/file.vicar' ).then( texture => {
 
 # API
 
-## VicarLoader
-
-Three.js implementation of VicarLoaderBase.
-
-_extends VicarLoaderBase_
-
-### .manager
-
-```js
-manager : LoadingManager = DefaultLoadingManager
-```
-
-### .constructor
-
-```js
-constructor( manager : LoadingManager = DefaultLoadingManager ) : void
-```
-
-### .load
-
-```js
-load( url : String, texture : DataTexture = new DataTexture() ) : DataTexture
-```
-
-Loads and parses the Vicar file and returns a DataTexture. If a DataTexture is passed into the function the data is applied to it.
-
-### .parse
-
-```js
-parse( buffer : Uint8Array | ArrayBuffer, texture : DataTexture = new DataTexture() ) : DataTexture
-```
-
-Parses the contents of the given Vicar file and returns a texture with the contents. The content of the arrays is mapped to a 255 bit color value based on the max values.
-
 ## VicarResult
 
 ### .labels
@@ -116,6 +82,50 @@ complex : Boolean
 ```
 
 Whether the values are complex or not as dependent on the `labels.FORMAT` field. This will be `true` if `labels.FORMAT` is `COMP` or `COMPLEX`.
+
+## VicarTextureResult
+
+### .texture
+
+```js
+texture : DataTexture
+```
+
+The result of the Vicar content as a texture.
+
+## VicarLoader
+
+Three.js implementation of VicarLoaderBase.
+
+_extends VicarLoaderBase_
+
+### .manager
+
+```js
+manager : LoadingManager = DefaultLoadingManager
+```
+
+### .constructor
+
+```js
+constructor( manager : LoadingManager = DefaultLoadingManager ) : void
+```
+
+### .load
+
+```js
+load( url : String, texture : DataTexture = new DataTexture() ) : VicarTextureResult
+```
+
+Loads and parses the Vicar file and returns a DataTexture. If a DataTexture is passed into the function the data is applied to it.
+
+### .parse
+
+```js
+parse( buffer : Uint8Array | ArrayBuffer, texture : DataTexture = new DataTexture() ) : VicarTextureResult
+```
+
+Parses the contents of the given Vicar file and returns a texture with the contents. The content of the arrays is mapped to a 255 bit color value based on the max values.
 
 ## VicarLoaderBase
 

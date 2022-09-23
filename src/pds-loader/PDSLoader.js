@@ -35,6 +35,14 @@ class PDSLoader {
 		 */
 		this.fetchOptions = { credentials: 'same-origin' };
 
+		/**
+		 * @member {Object}
+		 * @description Map from embedded format type to parse function
+		 */
+		this.parsers = {
+			'VICAR2': buffer => new VicarLoaderBase().parse( buffer ),
+		};
+
 	}
 
 	/**
@@ -148,14 +156,19 @@ class PDSLoader {
 
 		if ( noProducts || justVicarProduct ) {
 
-			if ( getFirstLabelInstance( labels, 'IMAGE_HEADER.HEADER_TYPE' ) === 'VICAR2' ) {
+			const type = getFirstLabelInstance( labels, 'IMAGE_HEADER.HEADER_TYPE' );
+			const parseFunc = this.parsers[ type ];
+			if ( ! parseFunc ) {
 
-				const loader = new VicarLoaderBase();
+				console.warn( `PDSLoader: No parser available for embedded format "${ type }".` );
+
+			} else if ( type === 'VICAR2' ) {
+
 				const vicarBuffer = new Uint8Array(
 					byteBuffer.buffer,
 					byteBuffer.byteOffset + labelSize,
 				);
-				result.product = loader.parse( vicarBuffer );
+				result.product = parseFunc( vicarBuffer );
 
 			} else {
 

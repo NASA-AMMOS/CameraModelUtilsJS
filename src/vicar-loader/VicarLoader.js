@@ -2,6 +2,14 @@ import { VicarLoaderBase } from './VicarLoaderBase.js';
 import { DataTexture, RGBAFormat, DefaultLoadingManager, LinearFilter, LinearMipMapLinearFilter } from 'three';
 
 /**
+ * @typedef {Object} VicarTextureResult
+ * @extends VicarTextureResult
+ * 
+ * @param {DataTexture} texture
+ */
+
+
+/**
  * Three.js implementation of VicarLoaderBase.
  */
 export class VicarLoader extends VicarLoaderBase {
@@ -61,21 +69,26 @@ export class VicarLoader extends VicarLoaderBase {
 	parse( buffer, texture = new DataTexture() ) {
 
 		let result = buffer;
-		if ( buffer instanceof ArrayBuffer ) {
+		if ( buffer instanceof ArrayBuffer || buffer instanceof Uint8Array ) {
 
 			result = super.parse( buffer );
 
 		}
 
 		// find the min and max value
+		// TODO: figure this out?
 		let max = - Infinity;
 		const stride = result.width * result.height;
 		for ( let i = 0; i < stride; i ++ ) {
 
-			const r = result.data[ stride * 0 + i ];
-			const g = result.data[ stride * 1 + i ];
-			const b = result.data[ stride * 2 + i ];
-			max = Math.max( max, r, g, b );
+				const r = result.data[ stride * 0 + i ];
+				const g = result.data[ stride * 1 + i ];
+				const b = result.data[ stride * 2 + i ];
+				// max = Math.max( max, r, g, b );
+
+				if ( r ) max = Math.max( max, r );
+				if ( g ) max = Math.max( max, g );
+				if ( b ) max = Math.max( max, b );
 
 		}
 
@@ -103,8 +116,24 @@ export class VicarLoader extends VicarLoaderBase {
 		for ( let i = 0; i < stride; i ++ ) {
 
 			const r = result.data[ stride * 0 + i ] / maxValue;
-			const g = result.data[ stride * 1 + i ] / maxValue;
-			const b = result.data[ stride * 2 + i ] / maxValue;
+			let g, b;
+			if ( result.depth === 1 ) {
+
+				g = r;
+				b = r;
+
+			} else if ( result.depth === 2 ) {
+
+				g = result.data[ stride * 1 + i ] / maxValue;
+				b = 0;
+
+			} else {
+
+				g = result.data[ stride * 1 + i ] / maxValue;
+				b = result.data[ stride * 2 + i ] / maxValue;
+
+			}
+
 			data[ i * 4 + 0 ] = r * 255;
 			data[ i * 4 + 1 ] = g * 255;
 			data[ i * 4 + 2 ] = b * 255;
@@ -122,8 +151,10 @@ export class VicarLoader extends VicarLoaderBase {
 		texture.flipY = true;
 		texture.generateMipmaps = true;
 		texture.needsUpdate = true;
+		
+		result.texture = texture;
 
-		return texture;
+		return result;
 
 	}
 
