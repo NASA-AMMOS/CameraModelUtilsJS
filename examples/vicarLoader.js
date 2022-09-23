@@ -41,6 +41,7 @@ async function init() {
 
 		// add labels to gui
 		const gui = new GUI();
+		gui.domElement.style.width = '300px';
 		gui.title( 'Labels' );
 
 		addLabelToGUI( gui, labels )

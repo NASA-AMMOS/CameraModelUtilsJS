@@ -42,6 +42,7 @@ async function init() {
 
 		// add labels to gui
 		const gui = new GUI();
+		gui.domElement.style.width = '300px';
 		gui.title( 'Labels' );
 
 		const pdsLabels = gui.addFolder( 'PDS Labels' );
