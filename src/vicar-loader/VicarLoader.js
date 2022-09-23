@@ -4,7 +4,7 @@ import { DataTexture, RGBAFormat, DefaultLoadingManager, LinearFilter, LinearMip
 /**
  * @typedef {Object} VicarTextureResult
  * @extends VicarTextureResult
- * 
+ *
  * @param {DataTexture} texture
  */
 
@@ -81,14 +81,14 @@ export class VicarLoader extends VicarLoaderBase {
 		const stride = result.width * result.height;
 		for ( let i = 0; i < stride; i ++ ) {
 
-				const r = result.data[ stride * 0 + i ];
-				const g = result.data[ stride * 1 + i ];
-				const b = result.data[ stride * 2 + i ];
-				// max = Math.max( max, r, g, b );
+			const r = result.data[ stride * 0 + i ];
+			const g = result.data[ stride * 1 + i ];
+			const b = result.data[ stride * 2 + i ];
+			// max = Math.max( max, r, g, b );
 
-				if ( r ) max = Math.max( max, r );
-				if ( g ) max = Math.max( max, g );
-				if ( b ) max = Math.max( max, b );
+			if ( r ) max = Math.max( max, r );
+			if ( g ) max = Math.max( max, g );
+			if ( b ) max = Math.max( max, b );
 
 		}
 
@@ -151,7 +151,7 @@ export class VicarLoader extends VicarLoaderBase {
 		texture.flipY = true;
 		texture.generateMipmaps = true;
 		texture.needsUpdate = true;
-		
+
 		result.texture = texture;
 
 		return result;

@@ -14,7 +14,7 @@ function createFile( labels, labelSize, contentSize ) {
 
 }
 
-describe( 'PDSLoader', () => {
+describe( 'VicarLoader', () => {
 
 	it( 'should correctly parse the vicar contents.', () => {
 
