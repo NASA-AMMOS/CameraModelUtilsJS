@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { PDSLoader, VicarLoader } from '../src/index.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { PDSLoader, VicarLoader } from '../src/index.js';
+import { addLabelToGUI, stretchTextureData } from './utils.js';
 
 let camera, scene, renderer, controls;
 
@@ -32,35 +33,12 @@ async function init() {
 	);
 	scene.add( plane );
 
-	const addLabelToGUI = ( folder, labels ) => {
-
-		for ( let i = 0, l = labels.length; i < l; i ++ ) {
-
-			const label = labels[ i ];
-			if ( ! ( label instanceof Object ) ) {
-
-				folder.add( { value: label }, 'value' ).name( `${ i }:` ).disable();
-
-			} else if ( Array.isArray( label.value ) ) {
-
-				const newFolder = folder.addFolder( label.name );
-				newFolder.close();
-				addLabelToGUI( newFolder, label.value );
-
-			} else {
-
-				folder.add( label, 'value' ).name( label.name ).disable();
-
-			}
-
-		}
-
-	};
-
 	// PGM file load
 	const loader = new PDSLoader();
 	loader.parsers[ 'VICAR2' ] = buffer => new VicarLoader().parse( buffer );
 	loader.load( './data/NRB_701383954RAS_F0933408NCAM00200M1.IMG' ).then( result => {
+
+		const { labels, product } = result;
 
 		// add labels to gui
 		const gui = new GUI();
@@ -72,14 +50,16 @@ async function init() {
 		const vicarLabels = gui.addFolder( 'Vicar Labels' );
 		vicarLabels.close();
 
-		addLabelToGUI( pdsLabels, result.labels )
-		addLabelToGUI( vicarLabels, result.product.labels )
+		addLabelToGUI( pdsLabels, labels )
+		addLabelToGUI( vicarLabels, product.labels )
 
-		const tex = result.product.texture;
+		const tex = product.texture;
 		plane.material.map = tex;
-		plane.material.map.needsUpdate = true;
 		plane.material.needsUpdate = true;
 		plane.scale.x = tex.image.width / tex.image.height;
+
+		// map the color data to the available precision for a richer image
+		stretchTextureData( tex );
 
 	} );
 
