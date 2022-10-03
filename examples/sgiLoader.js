@@ -33,7 +33,7 @@ async function init() {
 
 	// PGM file load
 	const loader = new SGILoader();
-	loader.load( './data/sample_1920×1280.sgi' ).then( tex => {
+	loader.load( './data/sample_1280×853.sgi' ).then( tex => {
 
 		plane.material.map = tex;
 		plane.material.map.needsUpdate = true;
