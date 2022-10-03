@@ -12,11 +12,13 @@ Series of packages for visualizing and rendering images and frustum shapes based
 
 [Rendering Camera View with Distortion](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/distortionPreview.html)
 
-[PGM Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/pgmLoader.html)
-
 [Vicar Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/vicarLoader.html)
 
 [PDS Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/pdsLoader.html)
+
+[RGB Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/rgbLoader.html)
+
+[PGM Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/pgmLoader.html)
 
 ## Package Docs
 
