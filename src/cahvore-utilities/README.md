@@ -35,7 +35,7 @@ frameBoundsToProjectionMatrix( modelInfo.maxFrameBounds, 0.1, 15.0, maxFrustum )
 const aspect = cahvoreModel.width / cahvoreModel.height;
 const renderTarget = new WebGLRenderTarget( 1000 * aspect, 1000 ); // TODO: set from model dimensions
 camera.projectionMatrix.copy( maxFrustum );
-camera.projectionMatrixInverse .copy( maxFrustum ).invert();
+camera.projectionMatrixInverse.copy( maxFrustum ).invert();
 renderer.setRenderTarget( renderTarget );
 renderer.render( scene, camera );
 renderer.setRenderTarget( null );
