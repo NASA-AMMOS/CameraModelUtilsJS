@@ -168,6 +168,9 @@ export function getLinearFrustumInfo( model ) {
 
 	const { C, A, H, V } = model;
 
+	// See Todd Litwin's "ccal" description of parameters and deriving "H'" and "V'" vectors
+	// which describe the sensor frame.
+	// https://github.jpl.nasa.gov/pages/telitwin/ccal/doc/www/ccal-parameters.html
 	_zAxis.copy( A ).normalize();
 	_xAxis.copy( H ).addScaledVector( A, - A.dot( H ) ).normalize();
 	_yAxis.copy( V ).addScaledVector( A, - A.dot( V ) ).normalize();
