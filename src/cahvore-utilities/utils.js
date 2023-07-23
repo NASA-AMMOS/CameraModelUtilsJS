@@ -138,10 +138,10 @@ const _zAxis = new Vector3();
 
 /**
  * @typedef {Object} FrameBounds
- * @param {Numeber} left
- * @param {Numeber} right
- * @param {Numeber} top
- * @param {Numeber} bottom
+ * @param {Number} left
+ * @param {Number} right
+ * @param {Number} top
+ * @param {Number} bottom
  */
 
 /**
