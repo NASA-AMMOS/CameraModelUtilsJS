@@ -16,7 +16,7 @@ Series of packages for visualizing and rendering images and frustum shapes based
 
 [PDS Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/pdsLoader.html)
 
-[RGB Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/rgbLoader.html)
+[SGI RGB Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/sgiLoader.html)
 
 [PGM Loading](https://nasa-ammos.github.io/CameraModelUtilsJS/examples/pgmLoader.html)
 
