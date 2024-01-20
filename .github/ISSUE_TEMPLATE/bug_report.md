@@ -1,43 +1,46 @@
 ---
-name: Bug Report
-about: Report a bug to help us improve
-title: '[Bug]: '
+name: Bug report
+about: Report a reproducible bug or regression.
+title: ''
 labels: 'bug'
 assignees: ''
 
 ---
 
-**Checked for duplicates**
-
-> Have you checked for duplicate issue tickets?
-
-- Ex. Yes - I've already checked
-- Ex. No - I haven't checked
+<!-- Ignoring this template may result in your bug report getting deleted -->
 
 **Describe the bug**
 
-> A clear and concise description of what the bug is. Plain-text snippets preferred but screenshots welcome.
+A clear and concise description of what the bug is. Before submitting, please remove unnecessary sections.
 
-Ex. When I did [...] action, I noticed [...]
+**To Reproduce**
 
-**What did you expect?**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. See error
 
-> A clear and concise description of what you expect to happen
+***Code***
 
-Ex. I expected [...]
+```js
+// code goes here
+```
 
-**Reproducible steps**
+***Live example***
 
-> How would we reproduce this bug? Please walk us through it step by step. Plain-text snippets preferred but screenshots welcome.
+-
 
-1.
-2.
-3.
+**Expected behavior**
 
-**What is your environment?**
+A clear and concise description of what you expected to happen.
 
-> Include any computer hardware, operating system, framework, browser, time-of-day or other contextual information related to your issue
+**Screenshots**
 
-- Ex. Version of this software [e.g. vX.Y.Z]
-- Ex. Operating System: [e.g. MacOSX with Docker Desktop vX.Y]
-- ...
+If applicable, add screenshots to help explain your problem (drag and drop the image).
+
+**Platform:**
+
+ - Device: [Desktop, Mobile, ...]
+ - OS: [Windows, MacOS, Linux, Android, iOS, ...]
+ - Browser: [Chrome, Firefox, Safari, Edge, ...]
+ - Three.js version: [r???]

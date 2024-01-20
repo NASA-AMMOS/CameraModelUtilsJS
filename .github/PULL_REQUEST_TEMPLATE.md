@@ -1,13 +1,9 @@
-## Purpose
-- Clear, easy-to-understand sentences outlining the purpose of the PR
-## Proposed Changes
-- [ADD] ...
-- [CHANGE] ...
-- [FIX] ...
-## Issues
-- Links to relevant issues
-- Example: issue-XYZ
-## Testing
-- Provide some proof you've tested your changes 
-- Example: test results available at ...
-- Example: tested on operating system ...
+Related issue: #XXXX
+
+**Description**
+
+A clear and concise description of what the problem was and how this pull request solves it.
+
+**Testing**
+
+How the PR has been tested.

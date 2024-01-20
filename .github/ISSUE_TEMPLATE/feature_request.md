@@ -1,34 +1,26 @@
 ---
-name: New Feature
-about: Suggest a new feature for us to implement
-title: '[New Feature]: '
+name: Feature request
+about: Suggest an idea for the project.
+title: ''
 labels: 'enhancement'
 assignees: ''
 
 ---
 
-**Checked for duplicates**
+<!-- Ignoring this template may result in your feature request getting deleted -->
 
-> Have you checked for duplicate issue tickets?
+**Is your feature request related to a problem? Please describe.**
 
-- Ex. Yes - I've already checked
-- Ex. No - I haven't checked
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-**Alternatives considered**
+**Describe the solution you'd like**
 
-> Have you considered alternative solutions to your feature request?
+A clear and concise description of what you want to happen.
 
-- Ex. Yes - and alternatives don't suffice
-- Ex. No - I haven't considered
+**Describe alternatives you've considered**
 
-**Related problems**
+A clear and concise description of any alternative solutions or features you've considered.
 
-> Is your feature request related to any problems? Please help us understand if so, including linking to any other issue tickets.
+**Additional context**
 
-Ex. I'm frustrated when [...] happens as documented in issue-XYZ
-
-**Describe the feature request**
-
-> A clear and concise description of your request. 
-
-Ex. I need or want [...]
+Add any other context or screenshots about the feature request here.
