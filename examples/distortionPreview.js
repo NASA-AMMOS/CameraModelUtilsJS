@@ -7,7 +7,7 @@ import { TilesRenderer } from '3d-tiles-renderer';
 
 let camera, frustumCamera, scene, renderer, controls, clock, cameraHelper, frameEl;
 let light, ambient, cameraModels, tilesGroup, tiles, skyTiles, renderTarget, pass;
-let frustumGroup, tiltGroup, frustumMesh, frustumLines, stencilGroup;
+let frustumGroup, tiltGroup, frustumMesh, frustumLines, stencilGroup, maskMesh;
 let time = 0;
 const PIP_RENDER_SCALE = 0.5;
 const TERRAIN_RENDER_ORDER = - 10;
@@ -82,14 +82,20 @@ async function init() {
 
 	// distorted frustum
 	frustumMesh = new FrustumMesh( new THREE.MeshPhongMaterial( {
-
 		transparent: true,
 		opacity: 0.1,
 		side: THREE.DoubleSide,
 		depthWrite: false,
-
 	} ) );
 	tiltGroup.add( frustumMesh );
+
+	maskMesh = new FrustumMesh( new THREE.MeshBasicMaterial( {
+		color: 0xffffff,
+		side: THREE.DoubleSide,
+		depthWrite: false,
+	} ) );
+	maskMesh.visible = false;
+	tiltGroup.add( maskMesh );
 
 	// distorted lines
 	frustumLines = new THREE.LineSegments(
@@ -217,6 +223,7 @@ async function init() {
 	renderTarget = new THREE.WebGLRenderTarget( 1, 1, {
 		generateMipmaps: true,
 		minFilter: THREE.LinearMipMapLinearFilter,
+		samples: 4,
 	} );
 	pass = new FullScreenQuad(
 		new CahvoreDistortionMaterial( {
@@ -275,7 +282,7 @@ function buildGUI() {
 
 	const frustumSettings = gui.addFolder( 'frustum' );
 	frustumSettings.add( params, 'camera', Object.keys( cameraModels ) ).onChange( updateFrustums );
-	frustumSettings.add( params, 'rendering', [ 'distorted', 'minimum', 'maximum', 'checkerboard' ] ).onChange( updateFrustums );
+	frustumSettings.add( params, 'rendering', [ 'distorted', 'minimum', 'maximum', 'checkerboard', 'mask' ] ).onChange( updateFrustums );
 	frustumSettings.add( params, 'showTint' );
 	frustumSettings.add( params, 'showVolume' );
 	frustumSettings.add( params, 'near', 0.01, 250 ).onChange( updateFrustums );
@@ -348,6 +355,12 @@ function updateFrustums() {
 
 	}
 
+	// update the mask mesh to define a planar mesh representing the projection
+	camera.near = 1;
+	camera.far = 1;
+	camera.planarProjectionFactor = 1;
+	maskMesh.setFromCahvoreParameters( camera );
+
 	// update the frustum lines
 	frustumLines.geometry.dispose();
 	frustumLines.geometry = new THREE.EdgesGeometry( frustumMesh.geometry, 10 );
@@ -370,7 +383,7 @@ function updateFrustums() {
 
 	// update the distortion material
 	pass.material.checkerboard = params.rendering === 'checkerboard';
-	pass.material.passthrough = params.rendering === 'minimum' || params.rendering === 'maximum';
+	pass.material.passthrough = params.rendering === 'minimum' || params.rendering === 'maximum' || params.rendering === 'mask';
 	pass.material.setFromCameraModel( camera.model );
 
 	updateRenderTarget();
@@ -413,10 +426,23 @@ function animation() {
 	skyTiles.setResolution( frustumCamera, renderTarget.texture.image.width, renderTarget.texture.image.height );
 	skyTiles.update();
 
-	// render the scene to the target
-	renderer.setClearColor( LINEAR_CLEAR_COLOR );
+	// render the scene for the picture in picture view
+	renderer.setClearColor( 0 );
 	renderer.setRenderTarget( renderTarget );
-	renderer.render( tilesGroup, frustumCamera );
+	if ( params.rendering === 'mask' ) {
+
+		// only render the mask mesh
+		maskMesh.visible = true;
+		renderer.render( maskMesh, frustumCamera );
+		maskMesh.visible = false;
+
+	} else {
+
+		// render the scene to the target
+		renderer.render( tilesGroup, frustumCamera );
+
+	}
+
 	renderer.setRenderTarget( null );
 	renderer.setClearColor( SRGB_CLEAR_COLOR );
 
